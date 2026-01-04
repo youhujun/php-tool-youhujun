@@ -4,12 +4,11 @@
          bootstrap="vendor/autoload.php"
          colors="true">
     <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">tests\Unit</directory>
+		<!-- Excel 模块的测试套件 -->
+        <testsuite name="Excel">
+            <directory suffix="Test.php">tests\Unit\Excel</directory>
         </testsuite>
     </testsuites>
-
-    <!-- 添加这个 <php> 块 -->
     <php>
         <ini name="error_reporting" value="E_ALL &amp; ~E_DEPRECATED" />
     </php>
