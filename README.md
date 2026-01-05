@@ -44,6 +44,8 @@ array_shift($result);
 //数据库操作
 ```
 
+**更多文档请查看[文档地址](https://www.youhu.club/)**
+
 ## 测试
 
 ### 安装
@@ -58,7 +60,11 @@ composer install --dev
 ```bash
 composer test --testsuite Excel
 ```
+- 单独测试Calendar
 
+```bash
+composer test --testsuite Calendar
+```
 - 全部测试
   
 ```bash

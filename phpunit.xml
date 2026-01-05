@@ -8,6 +8,10 @@
         <testsuite name="Excel">
             <directory suffix="Test.php">tests\Unit\Excel</directory>
         </testsuite>
+		<!-- Calendar 模块的测试套件 -->
+		<testsuite name="Calendar">
+            <directory suffix="Test.php">tests\Unit\Calendar</directory>
+        </testsuite>
     </testsuites>
     <php>
         <ini name="error_reporting" value="E_ALL &amp; ~E_DEPRECATED" />
