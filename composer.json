@@ -21,7 +21,6 @@
         "gregwar/captcha": "*",
 		"endroid/qr-code": "*",
         "tencentcloud/tencentcloud-sdk-php": "*",
-        "qiniu/php-sdk":"*",
 		"wechatpay/wechatpay": "*",
         "wechatpay/wechatpay-guzzle-middleware": "*",
 		"doctrine/dbal": "*",
