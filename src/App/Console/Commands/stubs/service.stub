@@ -1,0 +1,18 @@
+<?php
+/*
+ * @Descripttion: {{Description}}
+ * @version: v1
+ * @Author: youhujun youhu8888@163.com
+ * @Date: {{Date}}
+ * @LastEditors: youhujun youhu8888@163.com
+ * @LastEditTime: {{Date}}
+ * @FilePath: App\Service\V1{{ModulePath}}\{{ServiceClass}}.php
+ * Copyright (C) {{Year}} youhujun. All rights reserved.
+ */
+
+namespace {{Namespace}}\Service\V1{{ModulePath}};
+
+class {{ServiceClass}}
+{
+
+}
