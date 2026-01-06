@@ -120,7 +120,7 @@ class ExcelFacadeService
    {
        
 		if (empty($column[0]) || empty($data)) {
-            throw new CommonException('Excel export failed: Column headers or data is empty.');
+            throw new CommonException('ExcelExportError');
         }
 
          $spreadsheet = new Spreadsheet();
@@ -219,7 +219,7 @@ class ExcelFacadeService
 			// 检查并创建目录
 			if (!is_dir($savePath)) {
 				if (!mkdir($savePath, 0777, true) && !is_dir($savePath)) {
-					throw new CommonException("Failed to create directory '{$savePath}' for Excel export.");
+					throw new CommonException("FailedCreateDirectory");
 				}
 			}
 

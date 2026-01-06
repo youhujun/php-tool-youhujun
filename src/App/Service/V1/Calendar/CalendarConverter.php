@@ -83,7 +83,7 @@ class CalendarConverter
         $maxTime = mktime(0, 0, 0, 2, 9, $this->maxYear);
         if($datetime->getTimestamp() < $minTime || $datetime->getTimestamp() > $maxTime) {
             $date_string = $datetime->format('Y.n.j');
-            throw new CommonException("日期超出有效范围(1891.2.9 - 2100.2.9): $date_string");
+            throw new CommonException("DateRangeError");
         }
         return true;
     }

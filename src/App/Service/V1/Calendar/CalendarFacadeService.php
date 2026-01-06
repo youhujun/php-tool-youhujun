@@ -63,7 +63,7 @@ class CalendarFacadeService
     {
         // 验证日期格式
         if (!preg_match('/^\d{4}-\d{1,2}-\d{1,2}$/', $solarDateString)) {
-            throw new CommonException('阳历日期格式错误，正确格式为：YYYY-MM-DD');
+            throw new CommonException('DateFormatError');
         }
 
         // 解析阳历日期
@@ -74,7 +74,7 @@ class CalendarFacadeService
 
         // 验证日期有效性
         if (!checkdate($month, $day, $year)) {
-            throw new CommonException('阳历日期无效：' . $solarDateString);
+            throw new CommonException('SolarDateErro');
         }
 
         // 转换为农历
@@ -96,7 +96,7 @@ class CalendarFacadeService
     {
         // 验证日期格式
         if (!preg_match('/^\d{4}-\d{1,2}-\d{1,2}$/', $lunarDateString)) {
-            throw new CommonException('农历日期格式错误，正确格式为：YYYY-MM-DD');
+            throw new CommonException('LunarDateFormatError');
         }
 
         // 解析农历日期
@@ -107,13 +107,13 @@ class CalendarFacadeService
 
         // 基本验证：年、月、日范围
         if ($year < 1891 || $year > 2100) {
-            throw new CommonException('农历年份超出范围(1891-2100)：' . $year);
+            throw new CommonException('YearOutOfRange');
         }
         if ($month < 1 || $month > 13) {
-            throw new CommonException('农历月份超出范围(1-13)：' . $month);
+            throw new CommonException('MonthOutOfRange');
         }
         if ($day < 1 || $day > 30) {
-            throw new CommonException('农历日期超出范围(1-30)：' . $day);
+            throw new CommonException('DayOutOfRange');
         }
 
         // 转换为阳历
