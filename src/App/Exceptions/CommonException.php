@@ -123,7 +123,7 @@ class CommonException extends \Exception
      * @param string|null $errorKey 错误标识
      * @param \Throwable|null $previous 先前的异常
      */
-    public function __construct(?string $errorKey = null, \Throwable $previous = null)
+    public function __construct(string|null $errorKey = null, \Throwable|null $previous = null)
     {
         if ($errorKey) {
             $this->errorKey = $errorKey;

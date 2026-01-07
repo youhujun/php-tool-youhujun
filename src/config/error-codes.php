@@ -45,6 +45,21 @@ $systemCodeArray =  [
         'error' => 'NotFoundError',
         'msg' => '资源不存在'
     ],
+    'PathFormatError' => [
+        'code' => 10060,
+        'error' => 'PathFormatError',
+        'msg' => '路径格式错误'
+    ],
+    'UnsupportedTypeError' => [
+        'code' => 10070,
+        'error' => 'UnsupportedTypeError',
+        'msg' => '不支持的类型'
+    ],
+    'FileExistsError' => [
+        'code' => 10080,
+        'error' => 'FileExistsError',
+        'msg' => '文件已存在'
+    ],
 
     // ========== 微信公众号相关错误码 (50000-50999) ==========
    
@@ -143,11 +158,48 @@ $wechatCodeArray = [
         'error' => 'WechatOfficialRefreshTokenError',
         'msg' => '刷新微信令牌失败'
     ],
+    // ========== 微信支付相关错误码 (51000-51999) ==========
+    'WechatMerchantMerchantIdError' => [
+        'code' => 51000,
+        'error' => 'WechatMerchantMerchantIdError',
+        'msg' => '微信商户号未设置'
+    ],
+    'WechatMerchantMerchantSerialNumberError' => [
+        'code' => 51010,
+        'error' => 'WechatMerchantMerchantSerialNumberError',
+        'msg' => '商户API证书序列号未设置'
+    ],
+    'WechatMerchantMerchantPrivateKeyError' => [
+        'code' => 51020,
+        'error' => 'WechatMerchantMerchantPrivateKeyError',
+        'msg' => '商户私钥文件不存在或无法读取'
+    ],
+    'WechatMerchantWechatpayCertificateError' => [
+        'code' => 51030,
+        'error' => 'WechatMerchantWechatpayCertificateError',
+        'msg' => '微信支付平台证书文件不存在或无法读取'
+    ],
+    'WechatOfficialAppIdError' => [
+        'code' => 51040,
+        'error' => 'WechatOfficialAppIdError',
+        'msg' => '微信公众号AppId未设置'
+    ],
+    'WecahtMerchantNotifyUrlJsPayNotifyUrlError' => [
+        'code' => 51050,
+        'error' => 'WecahtMerchantNotifyUrlJsPayNotifyUrlError',
+        'msg' => 'JSAPI支付回调通知地址未设置'
+    ],
+    'PrePayOrderByWechatJsError' => [
+        'code' => 51060,
+        'error' => 'PrePayOrderByWechatJsError',
+        'msg' => '微信JSAPI下单失败'
+    ],
 ];
 
 $errorCodeArray = array_merge(
     $systemCodeArray,
 	$excelCodeArray,
+	$calendarCodeArray,
     $wechatCodeArray
 );
 

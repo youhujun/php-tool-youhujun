@@ -37,7 +37,7 @@ class GeneratorCommand
     /**
      * 解析路径并执行对应操作
      *
-     * @param string $path 路径,如: Facade/V1/Wechat/Official/WechatOfficialWebAuth
+     * @param string $path 路径,如: Wechat/Official/WechatOfficialWebAuth 或 Calendar
      * @param string $description 描述信息(仅用于生成 Service)
      * @return array 生成的文件路径
      * @throws CommonException
@@ -45,47 +45,27 @@ class GeneratorCommand
     public function generate(string $path, string $description = ''): array
     {
         $path = trim($path, '/\\');
+        // 统一使用正斜杠分割路径
+        $path = str_replace('\\', '/', $path);
         $parts = explode('/', $path);
 
-        if (count($parts) < 2) {
-            throw new CommonException('路径格式错误,正确格式: Facade/V1/Module/ClassName 或 Service/V1/Module/ClassName 或 V1/Module/ClassName');
+        if (count($parts) < 1) {
+            throw new CommonException('ParameterError');
         }
 
-        $type = $parts[0]; // Facade 或 Service 或 V1
-        $className = array_pop($parts); // 类名
+        $className = array_pop($parts); // 最后一段永远是类名(模块名)
 
-        // 处理类型和版本
-        $version = 'V1';
-        $modulePath = '';
-
-        if ($type === 'Facade') {
-            // Facade/V1/Module/ClassName
-            if (count($parts) < 3) {
-                throw new CommonException('路径格式错误,Facade 路径应为: Facade/V1/Module/ClassName');
-            }
-            $version = $parts[1]; // V1
-            $modulePath = implode('/', array_slice($parts, 2)); // 模块路径: Wechat/Official
-            $generatedFiles[] = $this->generateFacadeFile($className, $modulePath, $version);
-        } elseif ($type === 'Service') {
-            // Service/V1/Module/ClassName
-            if (count($parts) < 3) {
-                throw new CommonException('路径格式错误,Service 路径应为: Service/V1/Module/ClassName');
-            }
-            $version = $parts[1]; // V1
-            $modulePath = implode('/', array_slice($parts, 2)); // 模块路径: Wechat/Official
-            $generatedFiles[] = $this->generateServiceFile($className, $modulePath, $version, $description);
-        } elseif ($type === 'V1') {
-            // V1/Module/ClassName - 同时生成 Facade 和 Service (call:facade 的实际调用)
-            if (count($parts) < 2) {
-                throw new CommonException('路径格式错误,V1 路径应为: V1/Module/ClassName');
-            }
-            $modulePath = implode('/', array_slice($parts, 1)); // 模块路径: Calendar
-            // 直接使用原始类名,不再清理和添加后缀,由子方法处理
-            $generatedFiles[] = $this->generateFacadeFile($className, $modulePath, $version);
-            $generatedFiles[] = $this->generateServiceFile($className, $modulePath, $version, $description);
-        } else {
-            throw new CommonException('不支持的类型,只支持: Facade, Service, V1');
+        // 检查第一部分是否是版本号(V1, V2等)
+        $version = '';
+        if (!empty($parts) && preg_match('/^V\d+$/', $parts[0])) {
+            $version = array_shift($parts); // 提取版本号并从数组中移除
         }
+
+        $modulePath = implode('/', $parts); // 剩下的部分是模块路径
+
+        // 同时生成 Facade 和 Service
+        $generatedFiles[] = $this->generateFacadeFile($className, $modulePath, $version);
+        $generatedFiles[] = $this->generateServiceFile($className, $modulePath, $version, $description);
 
         return $generatedFiles;
     }
@@ -121,7 +101,7 @@ class GeneratorCommand
 
         // 检查文件是否已存在
         if (file_exists($facadeFile)) {
-            throw new CommonException('Facade 文件已存在: ' . $facadeFile);
+            throw new CommonException('FileExistsError');
         }
 
         // 生成内容
@@ -173,7 +153,7 @@ class GeneratorCommand
 
         // 检查文件是否已存在
         if (file_exists($serviceFile)) {
-            throw new CommonException('Service 文件已存在: ' . $serviceFile);
+            throw new CommonException('FileExistsError');
         }
 
         // 生成内容
