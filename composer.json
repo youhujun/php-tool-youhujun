@@ -1,0 +1,50 @@
+{
+    "name": "youhujun/php-tool-youhujun",
+    "description": "Tools for facilitating rapid development of PHP applications",
+    "license": "MIT",
+	"version": "1.1.0",
+    "authors": [
+        {
+            "name": "youhujun",
+            "email": "youhu8888@163.com"
+        }
+    ],
+    "keywords": [
+        "php",
+        "http",
+        "server",
+        "api"
+    ],
+    "require": {
+        "php": "^8.0.2",
+		"phpoffice/phpspreadsheet":"*",
+        "gregwar/captcha": "*",
+		"endroid/qr-code": "*",
+		"qiniu/php-sdk": "*",
+        "tencentcloud/tencentcloud-sdk-php": "*",
+		"wechatpay/wechatpay": "*",
+        "wechatpay/wechatpay-guzzle-middleware": "*",
+		"guzzlehttp/guzzle": "*"
+    },
+     "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+		"files": [
+			"src/config/tool-helper.php"
+		],
+        "psr-4": {
+            "YouHuJun\\Tool\\": "src/"
+        }
+    },
+    "extra": {
+    },
+    "config": {
+        "allow-plugins": {
+            "easywechat-composer/easywechat-composer": true
+        }
+    },
+	"scripts": {
+        "test": "phpunit"
+    }
+}

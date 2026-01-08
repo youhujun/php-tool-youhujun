@@ -1,0 +1,122 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * YouHuJun PHP Tool 命令行工具
+ *
+ * 用法:
+ *   php youhujun make:facade <路径> [描述]
+ *   php youhujun make:service <路径> [描述]
+ *   php youhujun call:facade <路径> [描述]
+ *
+ * 示例:
+ *   php youhujun make:facade Facade/V1/Wechat/Official/WechatOfficialWebAuth
+ *   php youhujun make:service Service/V1/Wechat/Official/WechatOfficialWebAuth
+ *   php youhujun call:facade V1/Wechat/Official/WechatOfficialWebAuth "微信公众号网页授权服务"
+ */
+
+$autoloadPath = __DIR__ . '/vendor/autoload.php';
+if (!file_exists($autoloadPath)) {
+    echo "错误: 找不到 autoload.php 文件: " . $autoloadPath . "\n";
+    exit(1);
+}
+
+require $autoloadPath;
+
+use YouHuJun\Tool\App\Console\Commands\GeneratorCommand;
+
+// 显示帮助信息
+function showHelp()
+{
+    echo "\nYouHuJun PHP Tool 命令行工具\n\n";
+    echo "用法:\n";
+    echo "  php youhujun make:facade <路径> [描述]\n";
+    echo "  php youhujun make:service <路径> [描述]\n";
+    echo "  php youhujun call:facade <路径> [描述]\n\n";
+    echo "命令说明:\n";
+    echo "  make:facade   只生成 Facade 文件\n";
+    echo "  make:service   只生成 Service 文件\n";
+    echo "  call:facade    同时生成 Facade 和 Service 文件\n\n";
+    echo "路径格式:\n";
+    echo "  Facade/V1/模块/类名          生成 Facade\n";
+    echo "  Service/V1/模块/类名         生成 Service\n";
+    echo "  V1/模块/类名                生成 Facade + Service\n\n";
+    echo "说明:\n";
+    echo "  - Facade 基础路径是: App/Facade\n";
+    echo "  - Service 基础路径是: App/Service\n";
+    echo "  - V1 是版本号,在基础路径之后\n\n";
+    echo "示例:\n";
+    echo "  php youhujun make:facade Facade/V1/Wechat/Official/WechatOfficialWebAuth\n";
+    echo "  php youhujun make:service Service/V1/Wechat/Official/WechatOfficialWebAuth\n";
+    echo "  php youhujun call:facade V1/Wechat/Official/WechatOfficialWebAuth \"描述信息\"\n\n";
+}
+
+// 解析参数
+if ($argc < 2) {
+    showHelp();
+    exit(1);
+}
+
+// 检查是否是帮助命令
+if (in_array($argv[1], ['-h', '--help', 'help'])) {
+    showHelp();
+    exit(0);
+}
+
+$command = $argv[1];
+$fullPath = $argv[2] ?? '';
+$description = $argv[3] ?? '';
+
+try {
+    $generator = new GeneratorCommand();
+    $generatedFiles = [];
+
+    switch ($command) {
+        case 'make:facade':
+            // make:facade Facade/V1/Wechat/Official/WechatOfficialWebAuth
+            if (empty($fullPath)) {
+                echo "错误: 请提供路径参数\n";
+                exit(1);
+            }
+            $generatedFiles = $generator->generate($fullPath, $description);
+            break;
+
+        case 'make:service':
+            // make:service Service/V1/Wechat/Official/WechatOfficialWebAuth
+            if (empty($fullPath)) {
+                echo "错误: 请提供路径参数\n";
+                exit(1);
+            }
+            $generatedFiles = $generator->generate($fullPath, $description);
+            break;
+
+        case 'call:facade':
+            // call:facade V1/Wechat/Official/WechatOfficialWebAuth
+            // 同时生成 Facade 和 Service
+            if (empty($fullPath)) {
+                echo "错误: 请提供路径参数\n";
+                exit(1);
+            }
+            $generatedFiles = $generator->generate($fullPath, $description);
+            break;
+
+        default:
+            echo "错误: 不支持的命令: $command\n";
+            echo "运行 'php youhujun help' 查看帮助\n";
+            exit(1);
+    }
+
+    // 显示生成的文件
+    echo "\n✓ 生成成功!\n";
+    foreach ($generatedFiles as $file) {
+        echo "  " . $file . "\n";
+    }
+    echo "\n";
+
+} catch (\Exception $e) {
+    echo "\n错误: " . $e->getMessage() . "\n\n";
+    exit(1);
+} catch (\Error $e) {
+    echo "\n错误: " . $e->getMessage() . "\n\n";
+    exit(1);
+}

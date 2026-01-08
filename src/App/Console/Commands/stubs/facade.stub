@@ -1,0 +1,42 @@
+<?php
+namespace {{Namespace}}\Facade\V1{{ModulePath}};
+
+use {{Namespace}}\Service\V1{{ModulePath}}\{{ServiceClass}};
+use BadMethodCallException;
+
+class {{FacadeClass}} 
+{
+    protected static $instance;
+
+    private function __construct() {}
+    private function __clone() {}
+
+    public static function setInstance({{ServiceClass}} $instance): void
+    {
+        static::$instance = $instance;
+    }
+
+    public static function clearInstance(): void
+    {
+        static::$instance = null;
+    }
+
+    protected static function getInstance(): {{ServiceClass}}
+    {
+        if (static::$instance === null) {
+            static::$instance = new {{ServiceClass}}();
+        }
+        return static::$instance;
+    }
+
+    public static function __callStatic(string $method, array $parameters)
+    {
+        $instance = static::getInstance();
+        if (!method_exists($instance, $method)) {
+            throw new BadMethodCallException(
+                sprintf('Call to undefined method %s::%s()', get_class($instance), $method)
+            );
+        }
+        return $instance->$method(...$parameters);
+    }
+}
