@@ -167,11 +167,49 @@ class CommonException extends \Exception
      */
     public function getErrorResponse(): array
     {
-        return [
+        // 确保UTF-8编码,防止中文乱码
+        $response = [
             'code' => $this->code,
             'error' => $this->errorKey,
             'msg' => $this->message
         ];
+
+        // 对字符串进行UTF-8编码检查和转换
+        array_walk_recursive($response, function(&$value) {
+            if (is_string($value)) {
+                // 确保字符串是UTF-8编码
+                if (!mb_check_encoding($value, 'UTF-8')) {
+                    $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8,GBK,GB2312,BIG5');
+                }
+            }
+        });
+
+        return $response;
+    }
+
+    /**
+     * 获取JSON格式的错误响应(带UTF-8编码保护)
+     *
+     * @return string 返回JSON字符串
+     */
+    public function getErrorResponseJson(): string
+    {
+        $response = $this->getErrorResponse();
+        // 使用 JSON_UNESCAPED_UNICODE 选项保持中文字符不被转义
+        return json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * 输出JSON格式的错误响应并设置正确的响应头
+     *
+     * @return void
+     */
+    public function sendErrorResponse(): void
+    {
+        // 设置响应头,指定UTF-8编码
+        header('Content-Type: application/json; charset=utf-8');
+        echo $this->getErrorResponseJson();
+        exit;
     }
 
     /**
