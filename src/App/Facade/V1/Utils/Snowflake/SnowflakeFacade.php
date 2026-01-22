@@ -17,18 +17,23 @@ use BadMethodCallException;
 class SnowflakeFacade
 {
     /**
+     * @var SnowflakeFacadeService|null
+     */
+    protected static ?SnowflakeFacadeService $instance = null;
+
+    /**
      * 生成雪花ID
      *
      * @param int|null $machineId 机器ID，不传则默认为1，用于分布式部署时不同节点配置不同值
      * @param string|null $startTime 起始时间，格式：Y-m-d H:i:s，不传则使用当天零点
-     * @return string 返回雪花ID字符串，避免大整数溢出
+     * @return int 返回雪花ID（64位整数）
      *
      * 示例:
      * SnowflakeFacade::generate();                                      // 使用默认配置（machineId=1,起始时间=当天零点）
      * SnowflakeFacade::generate(2);                                     // 指定machineId
      * SnowflakeFacade::generate(2, '2025-06-01 00:00:00');              // 指定machineId和起始时间
      */
-    public static function generate(?int $machineId = null, ?string $startTime = null): string
+    public static function generate(?int $machineId = null, ?string $startTime = null): int
     {
         return self::getInstance()->generate($machineId, $startTime);
     }
@@ -38,9 +43,9 @@ class SnowflakeFacade
      *
      * @param int|null $machineId 机器ID，不传则默认为1
      * @param string|null $startTime 起始时间，格式：Y-m-d H:i:s，不传则使用当天零点
-     * @return string
+     * @return int
      */
-    public static function id(?int $machineId = null, ?string $startTime = null): string
+    public static function id(?int $machineId = null, ?string $startTime = null): int
     {
         return self::getInstance()->generate($machineId, $startTime);
     }

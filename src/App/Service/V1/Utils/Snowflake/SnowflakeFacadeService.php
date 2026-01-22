@@ -17,26 +17,26 @@ use Godruoyi\Snowflake\Snowflake;
 class SnowflakeFacadeService
 {
     /**
-     * 生成雪花ID（返回字符串，避免大整数溢出）
+     * 生成雪花ID（返回int类型）
      *
      * @param int|null $machineId 机器ID，不传则默认为1
      * @param string|null $startTime 起始时间，格式：Y-m-d H:i:s，不传则使用当天零点
-     * @return string
+     * @return int
      */
-    public function generate(?int $machineId = null, ?string $startTime = null): string
+    public function generate(?int $machineId = null, ?string $startTime = null): int
     {
         $snowflake = $this->createSnowflake($machineId, $startTime);
-        return (string) $snowflake->id();
+        return (int) $snowflake->id();
     }
 
     /**
-     * 生成雪花ID（字符串类型，别名方法）
+     * 生成雪花ID（int类型，别名方法）
      *
      * @param int|null $machineId 机器ID，不传则默认为1
      * @param string|null $startTime 起始时间，格式：Y-m-d H:i:s，不传则使用当天零点
-     * @return string
+     * @return int
      */
-    public function id(?int $machineId = null, ?string $startTime = null): string
+    public function id(?int $machineId = null, ?string $startTime = null): int
     {
         return $this->generate($machineId, $startTime);
     }

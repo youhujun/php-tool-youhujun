@@ -34,12 +34,12 @@ echo "用户ID: " . $userId;  // 输出: 用户ID: 1893980458660888577
 
 ### 1. 生成雪花ID - `generate`
 
-生成一个唯一的雪花ID，返回字符串类型以避免大整数溢出。
+生成一个唯一的雪花ID，返回 int 类型（64位整数）。
 
 #### 方法签名
 
 ```php
-SnowflakeFacade::generate(?int $machineId = null, ?string $startTime = null): string
+SnowflakeFacade::generate(?int $machineId = null, ?string $startTime = null): int
 ```
 
 #### 参数说明
@@ -51,7 +51,7 @@ SnowflakeFacade::generate(?int $machineId = null, ?string $startTime = null): st
 
 #### 返回值
 
-返回字符串类型的雪花ID，避免大整数溢出问题。
+返回 int 类型的雪花ID（64位整数）。
 
 #### 使用示例
 
@@ -82,7 +82,7 @@ echo "自定义ID: " . $customId . "\n";
 #### 方法签名
 
 ```php
-SnowflakeFacade::id(?int $machineId = null, ?string $startTime = null): string
+SnowflakeFacade::id(?int $machineId = null, ?string $startTime = null): int
 ```
 
 #### 使用示例
@@ -159,7 +159,7 @@ use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
 /**
  * 生成用户ID
  */
-function generateUserId(): string
+function generateUserId(): int
 {
     // 使用默认配置生成用户ID
     return SnowflakeFacade::generate();
@@ -188,9 +188,9 @@ use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
  * 生成订单ID
  *
  * @param int $serverId 服务器ID（分布式部署时不同服务器使用不同ID）
- * @return string
+ * @return int
  */
-function generateOrderId(int $serverId): string
+function generateOrderId(int $serverId): int
 {
     // 不同服务器使用不同的machineId，确保全局唯一
     return SnowflakeFacade::generate($serverId);
@@ -225,9 +225,9 @@ class BusinessIdGenerator
     /**
      * 生成用户ID
      *
-     * @return string
+     * @return int
      */
-    public static function generateUserId(): string
+    public static function generateUserId(): int
     {
         return SnowflakeFacade::generate(1); // 用户模块使用machineId=1
     }
@@ -235,9 +235,9 @@ class BusinessIdGenerator
     /**
      * 生成订单ID
      *
-     * @return string
+     * @return int
      */
-    public static function generateOrderId(): string
+    public static function generateOrderId(): int
     {
         return SnowflakeFacade::generate(2); // 订单模块使用machineId=2
     }
@@ -245,9 +245,9 @@ class BusinessIdGenerator
     /**
      * 生成商品ID
      *
-     * @return string
+     * @return int
      */
-    public static function generateProductId(): string
+    public static function generateProductId(): int
     {
         return SnowflakeFacade::generate(3); // 商品模块使用machineId=3
     }
@@ -255,9 +255,9 @@ class BusinessIdGenerator
     /**
      * 生成支付流水号
      *
-     * @return string
+     * @return int
      */
-    public static function generatePaymentId(): string
+    public static function generatePaymentId(): int
     {
         return SnowflakeFacade::generate(4); // 支付模块使用machineId=4
     }
@@ -438,21 +438,17 @@ $userId = SnowflakeFacade::generate(
 ### 2. ID类型转换
 
 ```php
-// 生成ID（字符串）
+// 生成ID（int类型）
 $id = SnowflakeFacade::generate();
 
-// 转换为整数（注意：64位环境才安全）
-$intId = (int)$id;
-
-// 存储到数据库（使用字符串或BIGINT）
+// 存储到数据库（使用BIGINT）
 DB::table('users')->insert([
-    'id' => $id,  // 字符串类型
-    // 'id' => $intId,  // 或BIGINT类型
+    'id' => $id,  // int类型
     'name' => '张三'
 ]);
 
-// 从数据库读取（字符串）
-$storedId = $user->id;  // 已是字符串
+// 从数据库读取
+$storedId = $user->id;  // 已是int类型
 ```
 
 ### 3. 错误处理
@@ -500,8 +496,7 @@ try {
 **MySQL**:
 ```sql
 CREATE TABLE users (
-    id VARCHAR(20) PRIMARY KEY,  -- 推荐：字符串
-    -- id BIGINT UNSIGNED PRIMARY KEY,  -- 或：无符号BIGINT
+    id BIGINT UNSIGNED PRIMARY KEY,  -- 推荐：无符号BIGINT
     name VARCHAR(100)
 );
 ```
@@ -548,12 +543,15 @@ Redis::hset('users', $id, $userData);
 
 雪花ID的41位时间戳部分可支持约69年（2^41毫秒），对于大多数应用场景足够。如果需要更长的时间范围，可以通过调整起始时间或使用其他ID生成方案。
 
-### Q4: 为什么返回字符串而不是整数？
+### Q4: 为什么返回int类型而不是字符串？
 
-雪花ID可能超过PHP在32位环境下的整数最大值，返回字符串可以：
-- 兼容32位和64位PHP环境
-- 避免整数溢出问题
-- 在数据库中可以直接存储为字符串类型
+雪花ID返回int类型（64位整数）的优势：
+- 性能更好，无需类型转换
+- 存储空间更小（8字节）
+- 计算和比较更高效
+- 适合64位PHP环境
+
+**注意**: 在32位PHP环境中，雪花ID会超出整数最大值，建议使用64位PHP环境。
 
 ---
 
