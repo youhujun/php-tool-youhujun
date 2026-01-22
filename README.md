@@ -50,8 +50,7 @@ composer require youhujun/php-tool-youhujun
 
 ### 环境要求
 
-- PHP >= 8.0.2
-- 扩展: openssl, json, gd
+- PHP >= 8.2
 
 ## 使用
 
