@@ -42,6 +42,10 @@
 ### ☁️ 云存储
 - **七牛云存储**: 文件上传、删除、获取文件信息等
 
+### 🔧 工具类
+- **雪花算法 ID**: 基于雪花算法的分布式唯一 ID 生成,支持自定义机器 ID 和起始时间
+- **数据库分片**: 提供分库分表计算功能,支持灵活的分片策略配置
+
 ## 安装
 
 ```bash
@@ -51,136 +55,12 @@ composer require youhujun/php-tool-youhujun
 ### 环境要求
 
 - PHP >= 8.2
+- 扩展: openssl, json, gd
+- 依赖: godruoyi/php-snowflake (用于雪花算法 ID 生成)
 
 ## 使用
 
-### Excel 导入导出
-
-```php
-use YouHuJun\Tool\App\Facade\V1\Excel\ExcelFacade;
-
-// 导出
-ExcelFacade::exportExcelData($columns, $data, $title, $saveDirectory);
-
-// 导入
-ExcelFacade::initReadExcel($this->tempFile);
-ExcelFacade::setWorkSheet(0);
-$result = ExcelFacade::getDataByRow();
-
-// 移除表头后再进行断言，这更符合真实业务场景
-array_shift($result);
-
-//数据库操作
-```
-
-### 日历转换
-
-```php
-use YouHuJun\Tool\App\Facade\V1\Calendar\CalendarFacade;
-
-// 农历转公历
-$solarDate = CalendarFacade::lunarToSolar($lunarYear, $lunarMonth, $lunarDay, $isLeapMonth);
-
-// 公历转农历
-$lunarDate = CalendarFacade::solarToLunar($solarYear, $solarMonth, $solarDay);
-```
-
-### 二维码生成
-
-```php
-use YouHuJun\Tool\App\Facade\V1\Qrcode\QrcodeFacade;
-
-// 生成二维码
-$qrCode = QrcodeFacade::generate('https://example.com', $size = 300);
-$qrCode->save('qrcode.png');
-```
-
-### 微信小程序登录
-
-```php
-use YouHuJun\Tool\App\Facade\V1\Wechat\MiniProgram\WechatMiniProgramFacade;
-
-// 获取 OpenID
-$result = WechatMiniProgramFacade::getOpenIdByCode($code, $appid, $appSecret);
-```
-
-### 抖音登录
-
-```php
-use YouHuJun\Tool\App\Facade\V1\DouYin\Login\DouYinLoginFacade;
-
-// 抖音小程序登录
-$result = DouYinLoginFacade::getOpenIdByCodeWithMiniProgram($code, $anonymousCode, $appid, $appSecret);
-
-// 抖音小游戏登录
-$result = DouYinLoginFacade::getOpenIdByCodeWithMiniGame($code, $anonymousCode, $appid, $appSecret);
-```
-
-### AES 加密解密
-
-```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\AESFacade;
-
-// 加密
-$encrypted = AESFacade::encrypt('hello world', 'your-key');
-
-// 解密
-$decrypted = AESFacade::decrypt($encrypted, 'your-key');
-```
-
-### RSA 加密解密
-
-```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\RSAFacade;
-
-// 公钥加密
-$encrypted = RSAFacade::encrypt('hello world', $publicKey);
-
-// 私钥解密
-$decrypted = RSAFacade::decrypt($encrypted, $privateKey);
-```
-
-### 七牛云存储
-
-```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
-
-// 初始化配置
-QiNiuFacade::init($accessKey, $secretKey, $cdnUrl, $bucket);
-
-// 上传文件
-$result = QiNiuFacade::uploadFile($filePath, $savePath);
-
-// 获取私有文件链接
-$url = QiNiuFacade::getPrivateFileUrl($savePath);
-
-// 获取公有文件链接
-$url = QiNiuFacade::getPublicFileUrl($savePath);
-```
-
-- 导出
-
-```php
-use YouHuJun\Tool\App\Facade\V1\Excel\ExcelFacade;
-
-ExcelFacade::exportExcelData($columns, $data, $title, $saveDirectory);
-```
-- 导入
-
-```php
-use YouHuJun\Tool\App\Facade\V1\Excel\ExcelFacade;
-
-ExcelFacade::initReadExcel($this->tempFile);
-ExcelFacade::setWorkSheet(0);
-$result = ExcelFacade::getDataByRow();
-
-// 移除表头后再进行断言，这更符合真实业务场景
-array_shift($result);
-
-//数据库操作
-```
-
-**更多文档请查看[文档地址](https://www.youhu.club/)**
+**更多文档请查看[文档地址](https://www.youhujun.com/open-02/php-tool-youhujun/)**
 
 ## 测试
 
