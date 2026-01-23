@@ -17,7 +17,7 @@
 
 #### 文档
 - 新增 `Doucments/Utils/UseSnowflakeFacade.md` - 雪花算法使用文档
-- 新增 `Doucments/Utils/UseShardFacaeFacade.md` - 分片工具使用文档
+- 新增 `Doucments/Utils/UseShardFacade.md` - 分片工具使用文档
 
 ---
 

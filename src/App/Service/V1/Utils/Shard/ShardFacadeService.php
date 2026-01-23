@@ -1,18 +1,18 @@
 <?php
 /*
- * @Descripttion: 游鹄系统全局分片工具类（一步到位，所有模块复用）
+ * @Descripttion: 游鹄系统全局分片工具类（一步到位,所有模块复用）
  * @version: v1
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-01-23 12:51:24
  * @LastEditors: youhujun youhu8888@163.com
  * @LastEditTime: 2026-01-23 12:51:24
- * @FilePath: App\Service\V1\Utils\Shard\ShardFacaeFacadeService.php
+ * @FilePath: App\Service\V1\Utils\Shard\ShardFacadeService.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
 
 namespace YouHuJun\Tool\App\Service\V1\Utils\Shard;
 
-class ShardFacaeFacadeService
+class ShardFacadeService
 {
     /**
      * 分片配置
@@ -60,9 +60,9 @@ class ShardFacaeFacadeService
     }
 
     /**
-     * 全局统一：计算分片信息
+     * 全局统一:计算分片信息
      *
-     * @param string|int $userUid 用户UID（所有模块的核心分片依据）
+     * @param string|int $userUid 用户UID(所有模块的核心分片依据)
      * @return array [db_name, table_no, shard_key]
      */
     public function calc(string|int $userUid): array
@@ -76,7 +76,7 @@ class ShardFacaeFacadeService
         // 2. 统一转成数值计算
         $uid = (int)$userUid;
 
-        // 3. 计算分片库/表/分片键（全局唯一规则）
+        // 3. 计算分片库/表/分片键(全局唯一规则)
         $dbNo = $uid % $dbCount;
         $tableNo = $uid % $tableCount;
         $shardKey = $tableNo; // shard_key = user_uid % table_count
@@ -95,7 +95,7 @@ class ShardFacaeFacadeService
      * 获取分片表名
      *
      * @param string|int $userUid 用户UID
-     * @param string $baseTable 基础表名（如users/order/feed）
+     * @param string $baseTable 基础表名(如users/order/feed)
      * @return string 完整表名
      */
     public function getTableName(string|int $userUid, string $baseTable): string

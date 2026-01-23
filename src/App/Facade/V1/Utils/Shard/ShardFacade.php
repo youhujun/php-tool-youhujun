@@ -6,22 +6,22 @@
  * @Date: 2026-01-23 12:51:24
  * @LastEditors: youhujun youhu8888@163.com
  * @LastEditTime: 2026-01-23 12:51:24
- * @FilePath: \src\App\Facade\V1\Utils\Shard\ShardFacaeFacade.php
+ * @FilePath: \src\App\Facade\V1\Utils\Shard\ShardFacade.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
 namespace YouHuJun\Tool\App\Facade\V1\Utils\Shard;
 
-use YouHuJun\Tool\App\Service\V1\Utils\Shard\ShardFacaeFacadeService;
+use YouHuJun\Tool\App\Service\V1\Utils\Shard\ShardFacadeService;
 use BadMethodCallException;
 
-class ShardFacaeFacade
+class ShardFacade
 {
     protected static $instance;
 
     private function __construct() {}
     private function __clone() {}
 
-    public static function setInstance(ShardFacaeFacadeService $instance): void
+    public static function setInstance(ShardFacadeService $instance): void
     {
         static::$instance = $instance;
     }
@@ -55,13 +55,13 @@ class ShardFacaeFacade
     }
 
     /**
-     * 全局统一：计算分片信息
+     * 全局统一:计算分片信息
      *
-     * @param string|int $userUid 用户UID（所有模块的核心分片依据）
+     * @param string|int $userUid 用户UID(所有模块的核心分片依据)
      * @return array [db_name, table_no, shard_key]
      *
      * 示例:
-     * $info = ShardFacaeFacade::calc(123456);
+     * $info = ShardFacade::calc(123456);
      * // 返回: ['db' => 'ds_0', 'table_no' => 0, 'shard_key' => 0]
      */
     public static function calc(string|int $userUid): array
@@ -73,11 +73,11 @@ class ShardFacaeFacade
      * 获取分片表名
      *
      * @param string|int $userUid 用户UID
-     * @param string $baseTable 基础表名（如users/order/feed）
+     * @param string $baseTable 基础表名(如users/order/feed)
      * @return string 完整表名
      *
      * 示例:
-     * $tableName = ShardFacaeFacade::getTableName(123456, 'users');
+     * $tableName = ShardFacade::getTableName(123456, 'users');
      * // 返回: 'users_0'
      */
     public static function getTableName(string|int $userUid, string $baseTable): string
@@ -92,7 +92,7 @@ class ShardFacaeFacade
      * @return string 数据库名
      *
      * 示例:
-     * $dbName = ShardFacaeFacade::getDbName(123456);
+     * $dbName = ShardFacade::getDbName(123456);
      * // 返回: 'ds_0'
      */
     public static function getDbName(string|int $userUid): string
@@ -107,7 +107,7 @@ class ShardFacaeFacade
      * @return int 分片键
      *
      * 示例:
-     * $shardKey = ShardFacaeFacade::getShardKey(123456);
+     * $shardKey = ShardFacade::getShardKey(123456);
      * // 返回: 0
      */
     public static function getShardKey(string|int $userUid): int
@@ -115,10 +115,10 @@ class ShardFacaeFacade
         return self::getInstance()->getShardKey($userUid);
     }
 
-    protected static function getInstance(): ShardFacaeFacadeService
+    protected static function getInstance(): ShardFacadeService
     {
         if (static::$instance === null) {
-            static::$instance = new ShardFacaeFacadeService();
+            static::$instance = new ShardFacadeService();
         }
         return static::$instance;
     }

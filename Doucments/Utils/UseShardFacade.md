@@ -1,8 +1,8 @@
-# ShardFacaeFacade 使用说明
+# ShardFacade 使用说明
 
 ## 概述
 
-`ShardFacaeFacade` 提供了数据库分片计算功能,支持分库分表策略,适用于大流量、大数据量的业务场景。通过用户 UID 计算分片信息,实现数据的水平拆分。
+`ShardFacade` 提供了数据库分片计算功能,支持分库分表策略,适用于大流量、大数据量的业务场景。通过用户 UID 计算分片信息,实现数据的水平拆分。
 
 ## 特性
 
@@ -15,7 +15,7 @@
 ## 安装
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 ```
 
 ## 快速开始
@@ -23,17 +23,17 @@ use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
 ### 基础使用
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
 // 配置分片规则
-ShardFacaeFacade::setConfig([
+ShardFacade::setConfig([
     'db_count' => 2,          // 2个分片库
     'table_count' => 4,       // 每个库4张表
     'db_prefix' => 'db_',     // 数据库前缀
 ]);
 
 // 计算分片信息
-$info = ShardFacaeFacade::calc(123456);
+$info = ShardFacade::calc(123456);
 print_r($info);
 // 输出:
 // Array (
@@ -52,7 +52,7 @@ print_r($info);
 #### 方法签名
 
 ```php
-ShardFacaeFacade::calc(string|int $userUid): array
+ShardFacade::calc(string|int $userUid): array
 ```
 
 #### 参数说明
@@ -71,22 +71,22 @@ ShardFacaeFacade::calc(string|int $userUid): array
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
 // 配置分片规则
-ShardFacaeFacade::setConfig([
+ShardFacade::setConfig([
     'db_count' => 2,
     'table_count' => 4,
     'db_prefix' => 'ds_',
 ]);
 
 // 计算分片信息
-$info = ShardFacaeFacade::calc(1001);
+$info = ShardFacade::calc(1001);
 echo "数据库: " . $info['db'] . "\n";        // ds_1
 echo "表编号: " . $info['table_no'] . "\n";   // 1
 echo "分片键: " . $info['shard_key'] . "\n";   // 1
 
-$info = ShardFacaeFacade::calc(2002);
+$info = ShardFacade::calc(2002);
 echo "数据库: " . $info['db'] . "\n";        // ds_0
 echo "表编号: " . $info['table_no'] . "\n";   // 2
 echo "分片键: " . $info['shard_key'] . "\n";   // 2
@@ -101,7 +101,7 @@ echo "分片键: " . $info['shard_key'] . "\n";   // 2
 #### 方法签名
 
 ```php
-ShardFacaeFacade::getTableName(string|int $userUid, string $baseTable): string
+ShardFacade::getTableName(string|int $userUid, string $baseTable): string
 ```
 
 #### 参数说明
@@ -118,9 +118,9 @@ ShardFacaeFacade::getTableName(string|int $userUid, string $baseTable): string
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
-ShardFacaeFacade::setConfig([
+ShardFacade::setConfig([
     'db_count' => 2,
     'table_count' => 4,
 ]);
@@ -129,22 +129,22 @@ $user1Id = 1001;
 $user2Id = 2002;
 
 // 获取用户分片表名
-$user1Table = ShardFacaeFacade::getTableName($user1Id, 'users');
-$user2Table = ShardFacaeFacade::getTableName($user2Id, 'users');
+$user1Table = ShardFacade::getTableName($user1Id, 'users');
+$user2Table = ShardFacade::getTableName($user2Id, 'users');
 
 echo "用户1表名: " . $user1Table . "\n";  // users_1
 echo "用户2表名: " . $user2Table . "\n";  // users_2
 
 // 获取订单分片表名
-$order1Table = ShardFacaeFacade::getTableName($user1Id, 'orders');
-$order2Table = ShardFacaeFacade::getTableName($user2Id, 'orders');
+$order1Table = ShardFacade::getTableName($user1Id, 'orders');
+$order2Table = ShardFacade::getTableName($user2Id, 'orders');
 
 echo "订单1表名: " . $order1Table . "\n";  // orders_1
 echo "订单2表名: " . $order2Table . "\n";  // orders_2
 
 // 获取动态内容分片表名
-$feed1Table = ShardFacaeFacade::getTableName($user1Id, 'feeds');
-$feed2Table = ShardFacaeFacade::getTableName($user2Id, 'feeds');
+$feed1Table = ShardFacade::getTableName($user1Id, 'feeds');
+$feed2Table = ShardFacade::getTableName($user2Id, 'feeds');
 
 echo "动态1表名: " . $feed1Table . "\n";  // feeds_1
 echo "动态2表名: " . $feed2Table . "\n";  // feeds_2
@@ -159,7 +159,7 @@ echo "动态2表名: " . $feed2Table . "\n";  // feeds_2
 #### 方法签名
 
 ```php
-ShardFacaeFacade::getDbName(string|int $userUid): string
+ShardFacade::getDbName(string|int $userUid): string
 ```
 
 #### 参数说明
@@ -175,17 +175,17 @@ ShardFacaeFacade::getDbName(string|int $userUid): string
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
-ShardFacaeFacade::setConfig([
+ShardFacade::setConfig([
     'db_count' => 4,
     'db_prefix' => 'ds_',
 ]);
 
-$db1 = ShardFacaeFacade::getDbName(1001);
-$db2 = ShardFacaeFacade::getDbName(2002);
-$db3 = ShardFacaeFacade::getDbName(3003);
-$db4 = ShardFacaeFacade::getDbName(4004);
+$db1 = ShardFacade::getDbName(1001);
+$db2 = ShardFacade::getDbName(2002);
+$db3 = ShardFacade::getDbName(3003);
+$db4 = ShardFacade::getDbName(4004);
 
 echo "用户1数据库: " . $db1 . "\n";  // ds_1
 echo "用户2数据库: " . $db2 . "\n";  // ds_2
@@ -202,7 +202,7 @@ echo "用户4数据库: " . $db4 . "\n";  // ds_0
 #### 方法签名
 
 ```php
-ShardFacaeFacade::getShardKey(string|int $userUid): int
+ShardFacade::getShardKey(string|int $userUid): int
 ```
 
 #### 参数说明
@@ -218,15 +218,15 @@ ShardFacaeFacade::getShardKey(string|int $userUid): int
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
-ShardFacaeFacade::setConfig([
+ShardFacade::setConfig([
     'table_count' => 8,
 ]);
 
-$key1 = ShardFacaeFacade::getShardKey(1001);
-$key2 = ShardFacaeFacade::getShardKey(2002);
-$key3 = ShardFacaeFacade::getShardKey(3003);
+$key1 = ShardFacade::getShardKey(1001);
+$key2 = ShardFacade::getShardKey(2002);
+$key3 = ShardFacade::getShardKey(3003);
 
 echo "用户1分片键: " . $key1 . "\n";  // 1
 echo "用户2分片键: " . $key2 . "\n";  // 2
@@ -240,7 +240,7 @@ echo "用户3分片键: " . $key3 . "\n";  // 3
 #### 设置配置 - `setConfig`
 
 ```php
-ShardFacaeFacade::setConfig(array $config): void
+ShardFacade::setConfig(array $config): void
 ```
 
 #### 参数说明
@@ -261,10 +261,10 @@ ShardFacaeFacade::setConfig(array $config): void
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
 // 设置完整配置
-ShardFacaeFacade::setConfig([
+ShardFacade::setConfig([
     'db_count' => 4,           // 4个分片库
     'table_count' => 16,        // 每个库16张表
     'db_prefix' => 'shard_',    // 数据库前缀
@@ -272,7 +272,7 @@ ShardFacaeFacade::setConfig([
 ]);
 
 // 设置部分配置（与现有配置合并）
-ShardFacaeFacade::setConfig([
+ShardFacade::setConfig([
     'db_count' => 8,  // 只修改库数量
 ]);
 ```
@@ -280,26 +280,26 @@ ShardFacaeFacade::setConfig([
 #### 获取配置 - `getConfig`
 
 ```php
-ShardFacaeFacade::getConfig(string $key, mixed $default = null): mixed
+ShardFacade::getConfig(string $key, mixed $default = null): mixed
 ```
 
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
-ShardFacaeFacade::setConfig([
+ShardFacade::setConfig([
     'db_count' => 4,
     'table_count' => 16,
 ]);
 
 // 获取配置
-$dbCount = ShardFacaeFacade::getConfig('db_count');        // 4
-$tableCount = ShardFacaeFacade::getConfig('table_count'); // 16
-$dbPrefix = ShardFacaeFacade::getConfig('db_prefix');    // ds_
+$dbCount = ShardFacade::getConfig('db_count');        // 4
+$tableCount = ShardFacade::getConfig('table_count'); // 16
+$dbPrefix = ShardFacade::getConfig('db_prefix');    // ds_
 
 // 获取不存在的配置，使用默认值
-$customValue = ShardFacaeFacade::getConfig('custom_key', 'default_value'); // default_value
+$customValue = ShardFacade::getConfig('custom_key', 'default_value'); // default_value
 ```
 
 ---
@@ -311,14 +311,14 @@ $customValue = ShardFacaeFacade::getConfig('custom_key', 'default_value'); // de
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
 class UserRepository
 {
     public function __construct()
     {
         // 初始化分片配置
-        ShardFacaeFacade::setConfig([
+        ShardFacade::setConfig([
             'db_count' => 4,
             'table_count' => 16,
             'db_prefix' => 'user_db_',
@@ -334,8 +334,8 @@ class UserRepository
     public function getUser(int $userId): array
     {
         // 获取分片信息
-        $shard = ShardFacaeFacade::calc($userId);
-        $tableName = ShardFacaeFacade::getTableName($userId, 'users');
+        $shard = ShardFacade::calc($userId);
+        $tableName = ShardFacade::getTableName($userId, 'users');
 
         // 根据分片信息查询数据库
         // $user = DB::connection($shard['db'])
@@ -361,7 +361,7 @@ class UserRepository
         $userId = 123456; // 假设生成的用户ID
 
         // 获取分片表名
-        $tableName = ShardFacaeFacade::getTableName($userId, 'users');
+        $tableName = ShardFacade::getTableName($userId, 'users');
 
         // 插入数据
         // DB::connection($shard['db'])
@@ -388,13 +388,13 @@ $user = $repo->getUser(1001);
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
 class OrderRepository
 {
     public function __construct()
     {
-        ShardFacaeFacade::setConfig([
+        ShardFacade::setConfig([
             'db_count' => 8,
             'table_count' => 32,
             'db_prefix' => 'order_db_',
@@ -409,8 +409,8 @@ class OrderRepository
      */
     public function getUserOrders(int $userId): array
     {
-        $shard = ShardFacaeFacade::calc($userId);
-        $tableName = ShardFacaeFacade::getTableName($userId, 'orders');
+        $shard = ShardFacade::calc($userId);
+        $tableName = ShardFacade::getTableName($userId, 'orders');
 
         echo "查询数据库: " . $shard['db'] . "\n";
         echo "查询表名: " . $tableName . "\n";
@@ -434,8 +434,8 @@ class OrderRepository
     {
         $orderId = time() . mt_rand(1000, 9999); // 生成订单号
 
-        $shard = ShardFacaeFacade::calc($userId);
-        $tableName = ShardFacaeFacade::getTableName($userId, 'orders');
+        $shard = ShardFacade::calc($userId);
+        $tableName = ShardFacade::getTableName($userId, 'orders');
 
         // DB::connection($shard['db'])
         //   ->table($tableName)
@@ -464,13 +464,13 @@ $orders = $orderRepo->getUserOrders(2002);
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
 class FeedRepository
 {
     public function __construct()
     {
-        ShardFacaeFacade::setConfig([
+        ShardFacade::setConfig([
             'db_count' => 2,
             'table_count' => 8,
             'db_prefix' => 'feed_db_',
@@ -488,8 +488,8 @@ class FeedRepository
     {
         $feedId = time() . mt_rand(100, 999);
 
-        $shard = ShardFacaeFacade::calc($userId);
-        $tableName = ShardFacaeFacade::getTableName($userId, 'feeds');
+        $shard = ShardFacade::calc($userId);
+        $tableName = ShardFacade::getTableName($userId, 'feeds');
 
         echo "动态存储在: " . $shard['db'] . '.' . $tableName . "\n";
 
@@ -512,8 +512,8 @@ class FeedRepository
      */
     public function getUserFeeds(int $userId): array
     {
-        $shard = ShardFacaeFacade::calc($userId);
-        $tableName = ShardFacaeFacade::getTableName($userId, 'feeds');
+        $shard = ShardFacade::calc($userId);
+        $tableName = ShardFacade::getTableName($userId, 'feeds');
 
         echo "查询动态: " . $shard['db'] . '.' . $tableName . "\n";
 
@@ -539,10 +539,10 @@ $feedRepo->publishFeed(3003, '这是一条新的动态内容');
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacaeFacade;
+use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 
 // 全局统一分片配置（应用启动时配置一次）
-ShardFacaeFacade::setConfig([
+ShardFacade::setConfig([
     'db_count' => 4,
     'table_count' => 16,
     'db_prefix' => 'ds_',
@@ -551,8 +551,8 @@ ShardFacaeFacade::setConfig([
 // 用户模块
 function getUserData(int $userId): array
 {
-    $shard = ShardFacaeFacade::calc($userId);
-    $userTable = ShardFacaeFacade::getTableName($userId, 'users');
+    $shard = ShardFacade::calc($userId);
+    $userTable = ShardFacade::getTableName($userId, 'users');
     echo "用户: " . $shard['db'] . '.' . $userTable . "\n";
     return [];
 }
@@ -560,8 +560,8 @@ function getUserData(int $userId): array
 // 订单模块
 function getUserOrders(int $userId): array
 {
-    $shard = ShardFacaeFacade::calc($userId);
-    $orderTable = ShardFacaeFacade::getTableName($userId, 'orders');
+    $shard = ShardFacade::calc($userId);
+    $orderTable = ShardFacade::getTableName($userId, 'orders');
     echo "订单: " . $shard['db'] . '.' . $orderTable . "\n";
     return [];
 }
@@ -569,8 +569,8 @@ function getUserOrders(int $userId): array
 // 动态模块
 function getUserFeeds(int $userId): array
 {
-    $shard = ShardFacaeFacade::calc($userId);
-    $feedTable = ShardFacaeFacade::getTableName($userId, 'feeds');
+    $shard = ShardFacade::calc($userId);
+    $feedTable = ShardFacade::getTableName($userId, 'feeds');
     echo "动态: " . $shard['db'] . '.' . $feedTable . "\n";
     return [];
 }
@@ -625,7 +625,7 @@ getUserFeeds($userId); // 动态: ds_1.feeds_1
 
 ```php
 // bootstrap.php 或 config.php 中统一配置
-ShardFacaeFacade::setConfig([
+ShardFacade::setConfig([
     'db_count' => config('shard.db_count', 4),
     'table_count' => config('shard.table_count', 16),
     'db_prefix' => config('shard.db_prefix', 'ds_'),
@@ -646,12 +646,12 @@ class BaseRepository
 
     protected function getTableName(int $userId): string
     {
-        return ShardFacaeFacade::getTableName($userId, $this->baseTable);
+        return ShardFacade::getTableName($userId, $this->baseTable);
     }
 
     protected function getDbName(int $userId): string
     {
-        return ShardFacaeFacade::getDbName($userId);
+        return ShardFacade::getDbName($userId);
     }
 }
 
@@ -682,7 +682,7 @@ class DBManager
      */
     public static function getConnection(int $userId)
     {
-        $dbName = ShardFacaeFacade::getDbName($userId);
+        $dbName = ShardFacade::getDbName($userId);
 
         // 检查连接是否存在,不存在则创建
         if (!DB::connection($dbName)) {
@@ -698,7 +698,7 @@ class DBManager
     public static function query(int $userId, string $table, callable $callback)
     {
         $connection = self::getConnection($userId);
-        $tableName = ShardFacaeFacade::getTableName($userId, $table);
+        $tableName = ShardFacade::getTableName($userId, $table);
 
         return $callback($connection->table($tableName));
     }
@@ -721,10 +721,10 @@ class ShardMigration
     public static function expandShards(int $newDbCount, int $newTableCount)
     {
         // 1. 更新配置
-        $oldDbCount = ShardFacaeFacade::getConfig('db_count');
-        $oldTableCount = ShardFacaeFacade::getConfig('table_count');
+        $oldDbCount = ShardFacade::getConfig('db_count');
+        $oldTableCount = ShardFacade::getConfig('table_count');
 
-        ShardFacaeFacade::setConfig([
+        ShardFacade::setConfig([
             'db_count' => $newDbCount,
             'table_count' => $newTableCount,
         ]);
@@ -732,8 +732,8 @@ class ShardMigration
         // 2. 迁移数据
         for ($uid = 0; $uid < 10000; $uid++) {
             // 计算新分片位置
-            $newShard = ShardFacaeFacade::calc($uid);
-            $newTable = ShardFacaeFacade::getTableName($uid, 'users');
+            $newShard = ShardFacade::calc($uid);
+            $newTable = ShardFacade::getTableName($uid, 'users');
 
             // 从旧分片读取数据
             // $oldData = $this->getDataFromOldShard($uid);
