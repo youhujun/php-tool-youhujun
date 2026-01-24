@@ -57,62 +57,62 @@ class ShardFacade
     /**
      * 全局统一:计算分片信息
      *
-     * @param string|int $userUid 用户UID(所有模块的核心分片依据)
+     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID,所有模块的核心分片依据)
      * @return array [db_name, table_no, shard_key]
      *
      * 示例:
      * $info = ShardFacade::calc(123456);
      * // 返回: ['db' => 'ds_0', 'table_no' => 0, 'shard_key' => 0]
      */
-    public static function calc(string|int $userUid): array
+    public static function calc(string|int $uid): array
     {
-        return self::getInstance()->calc($userUid);
+        return self::getInstance()->calc($uid);
     }
 
     /**
      * 获取分片表名
      *
-     * @param string|int $userUid 用户UID
-     * @param string $baseTable 基础表名(如users/order/feed)
+     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
+     * @param string $baseTable 基础表名(如users/order/feed/shop)
      * @return string 完整表名
      *
      * 示例:
      * $tableName = ShardFacade::getTableName(123456, 'users');
      * // 返回: 'users_0'
      */
-    public static function getTableName(string|int $userUid, string $baseTable): string
+    public static function getTableName(string|int $uid, string $baseTable): string
     {
-        return self::getInstance()->getTableName($userUid, $baseTable);
+        return self::getInstance()->getTableName($uid, $baseTable);
     }
 
     /**
      * 获取分片数据库连接名
      *
-     * @param string|int $userUid 用户UID
+     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
      * @return string 数据库名
      *
      * 示例:
      * $dbName = ShardFacade::getDbName(123456);
      * // 返回: 'ds_0'
      */
-    public static function getDbName(string|int $userUid): string
+    public static function getDbName(string|int $uid): string
     {
-        return self::getInstance()->getDbName($userUid);
+        return self::getInstance()->getDbName($uid);
     }
 
     /**
      * 获取分片键值
      *
-     * @param string|int $userUid 用户UID
+     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
      * @return int 分片键
      *
      * 示例:
      * $shardKey = ShardFacade::getShardKey(123456);
      * // 返回: 0
      */
-    public static function getShardKey(string|int $userUid): int
+    public static function getShardKey(string|int $uid): int
     {
-        return self::getInstance()->getShardKey($userUid);
+        return self::getInstance()->getShardKey($uid);
     }
 
     protected static function getInstance(): ShardFacadeService

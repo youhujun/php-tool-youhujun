@@ -2,7 +2,7 @@
 
 ## 概述
 
-`ShardFacade` 提供了数据库分片计算功能,支持分库分表策略,适用于大流量、大数据量的业务场景。通过用户 UID 计算分片信息,实现数据的水平拆分。
+`ShardFacade` 提供了数据库分片计算功能,支持分库分表策略,适用于大流量、大数据量的业务场景。通过业务ID(用户UID/店铺UID等业务实体ID)计算分片信息,实现数据的水平拆分。
 
 ## 特性
 
@@ -10,7 +10,7 @@
 - ✅ **简单易用**: 提供便捷的静态方法调用
 - ✅ **灵活配置**: 支持自定义分片规则
 - ✅ **无依赖**: 不依赖任何框架或外部配置
-- ✅ **全局统一**: 所有模块共享同一套分片规则
+- ✅ **全局统一**: 所有模块共享同一套分片规则,使用相同的业务ID进行分片计算
 
 ## 安装
 
@@ -47,19 +47,19 @@ print_r($info);
 
 ### 1. 计算分片信息 - `calc`
 
-根据用户 UID 计算分片库、分片表和分片键。
+根据业务ID(用户UID/店铺UID等业务实体ID)计算分片库、分片表和分片键。
 
 #### 方法签名
 
 ```php
-ShardFacade::calc(string|int $userUid): array
+ShardFacade::calc(string|int $uid): array
 ```
 
 #### 参数说明
 
 | 参数名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| userUid | string\|int | 是 | 用户 UID（所有模块的核心分片依据） |
+| uid | string\|int | 是 | 业务ID(用户UID/店铺UID等业务实体ID,所有模块的核心分片依据) |
 
 #### 返回值
 
@@ -96,20 +96,20 @@ echo "分片键: " . $info['shard_key'] . "\n";   // 2
 
 ### 2. 获取分片表名 - `getTableName`
 
-根据用户 UID 和基础表名获取完整的分片表名。
+根据业务ID和基础表名获取完整的分片表名。
 
 #### 方法签名
 
 ```php
-ShardFacade::getTableName(string|int $userUid, string $baseTable): string
+ShardFacade::getTableName(string|int $uid, string $baseTable): string
 ```
 
 #### 参数说明
 
 | 参数名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| userUid | string\|int | 是 | 用户 UID |
-| baseTable | string | 是 | 基础表名（如 users/order/feed） |
+| uid | string\|int | 是 | 业务ID(用户UID/店铺UID等业务实体ID) |
+| baseTable | string | 是 | 基础表名（如 users/order/feed/shop） |
 
 #### 返回值
 
@@ -154,19 +154,19 @@ echo "动态2表名: " . $feed2Table . "\n";  // feeds_2
 
 ### 3. 获取数据库名 - `getDbName`
 
-根据用户 UID 获取分片数据库名。
+根据业务ID获取分片数据库名。
 
 #### 方法签名
 
 ```php
-ShardFacade::getDbName(string|int $userUid): string
+ShardFacade::getDbName(string|int $uid): string
 ```
 
 #### 参数说明
 
 | 参数名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| userUid | string\|int | 是 | 用户 UID |
+| uid | string\|int | 是 | 业务ID(用户UID/店铺UID等业务实体ID) |
 
 #### 返回值
 
@@ -197,19 +197,19 @@ echo "用户4数据库: " . $db4 . "\n";  // ds_0
 
 ### 4. 获取分片键 - `getShardKey`
 
-根据用户 UID 获取分片键值。
+根据业务ID获取分片键值。
 
 #### 方法签名
 
 ```php
-ShardFacade::getShardKey(string|int $userUid): int
+ShardFacade::getShardKey(string|int $uid): int
 ```
 
 #### 参数说明
 
 | 参数名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| userUid | string\|int | 是 | 用户 UID |
+| uid | string\|int | 是 | 业务ID(用户UID/店铺UID等业务实体ID) |
 
 #### 返回值
 
@@ -591,8 +591,8 @@ getUserFeeds($userId); // 动态: ds_1.feeds_1
 当前采用 **取模分片** 策略:
 
 ```
-数据库编号 = user_id % db_count
-表编号     = user_id % table_count
+数据库编号 = uid % db_count
+表编号     = uid % table_count
 分片键     = 表编号
 ```
 
@@ -602,8 +602,8 @@ getUserFeeds($userId); // 动态: ds_1.feeds_1
 - `db_count = 2` (2个分片库)
 - `table_count = 4` (每库4张表)
 
-| 用户ID | 数据库 | 表编号 | 分片键 | 完整表名 |
-|--------|--------|--------|--------|----------|
+| 业务ID(用户ID/店铺ID等) | 数据库 | 表编号 | 分片键 | 完整表名 |
+|-------------------|--------|--------|--------|----------|
 | 1001 | ds_1 | 1 | 1 | users_1 |
 | 1002 | ds_0 | 2 | 2 | users_2 |
 | 1003 | ds_1 | 3 | 3 | users_3 |
@@ -756,9 +756,10 @@ ShardMigration::expandShards(8, 32);
 
 ### 1. 分片键选择
 
-- **推荐使用用户ID**: 用户的业务数据都按用户ID分片,保证同一用户数据在同一分片
+- **推荐使用稳定的业务ID**: 推荐使用用户UID、店铺UID等业务实体ID作为分片依据,保证同一实体的数据在同一分片
 - **避免使用自增ID**: 自增ID会导致数据分布不均匀
-- **保持稳定性**: 分片键一旦确定,不要随意修改
+- **保持稳定性**: 业务ID一旦确定,不要随意修改
+- **通用性**: 业务ID可以是用户UID、店铺UID、商家UID等各种业务实体ID
 
 ### 2. 分片数量规划
 
@@ -825,7 +826,7 @@ ShardMigration::expandShards(8, 32);
 |------|------|------|
 | `setConfig()` | 设置分片配置 | `$config` (配置数组) |
 | `getConfig()` | 获取配置值 | `$key` (配置键), `$default` (默认值) |
-| `calc()` | 计算分片信息 | `$userUid` (用户ID) |
-| `getTableName()` | 获取分片表名 | `$userUid` (用户ID), `$baseTable` (基础表名) |
-| `getDbName()` | 获取数据库名 | `$userUid` (用户ID) |
-| `getShardKey()` | 获取分片键 | `$userUid` (用户ID) |
+| `calc()` | 计算分片信息 | `$uid` (业务ID:用户UID/店铺UID等) |
+| `getTableName()` | 获取分片表名 | `$uid` (业务ID), `$baseTable` (基础表名) |
+| `getDbName()` | 获取数据库名 | `$uid` (业务ID) |
+| `getShardKey()` | 获取分片键 | `$uid` (业务ID) |

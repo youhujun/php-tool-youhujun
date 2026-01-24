@@ -62,10 +62,10 @@ class ShardFacadeService
     /**
      * 全局统一:计算分片信息
      *
-     * @param string|int $userUid 用户UID(所有模块的核心分片依据)
+     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID,所有模块的核心分片依据)
      * @return array [db_name, table_no, shard_key]
      */
-    public function calc(string|int $userUid): array
+    public function calc(string|int $uid): array
     {
         // 1. 读取分片配置
         $dbCount = $this->config['db_count'];
@@ -74,12 +74,12 @@ class ShardFacadeService
         $defaultDb = $this->config['default_db'];
 
         // 2. 统一转成数值计算
-        $uid = (int)$userUid;
+        $uidValue = (int)$uid;
 
         // 3. 计算分片库/表/分片键(全局唯一规则)
-        $dbNo = $uid % $dbCount;
-        $tableNo = $uid % $tableCount;
-        $shardKey = $tableNo; // shard_key = user_uid % table_count
+        $dbNo = $uidValue % $dbCount;
+        $tableNo = $uidValue % $tableCount;
+        $shardKey = $tableNo; // shard_key = uid % table_count
 
         // 4. 拼接库名
         $dbName = $dbPrefix . $dbNo;
@@ -94,37 +94,37 @@ class ShardFacadeService
     /**
      * 获取分片表名
      *
-     * @param string|int $userUid 用户UID
-     * @param string $baseTable 基础表名(如users/order/feed)
+     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
+     * @param string $baseTable 基础表名(如users/order/feed/shop)
      * @return string 完整表名
      */
-    public function getTableName(string|int $userUid, string $baseTable): string
+    public function getTableName(string|int $uid, string $baseTable): string
     {
-        $calc = $this->calc($userUid);
+        $calc = $this->calc($uid);
         return $baseTable . '_' . $calc['table_no'];
     }
 
     /**
      * 获取分片数据库连接名
      *
-     * @param string|int $userUid 用户UID
+     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
      * @return string 数据库名
      */
-    public function getDbName(string|int $userUid): string
+    public function getDbName(string|int $uid): string
     {
-        $calc = $this->calc($userUid);
+        $calc = $this->calc($uid);
         return $calc['db'];
     }
 
     /**
      * 获取分片键值
      *
-     * @param string|int $userUid 用户UID
+     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
      * @return int 分片键
      */
-    public function getShardKey(string|int $userUid): int
+    public function getShardKey(string|int $uid): int
     {
-        $calc = $this->calc($userUid);
+        $calc = $this->calc($uid);
         return $calc['shard_key'];
     }
 }
