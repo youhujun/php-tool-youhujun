@@ -29,7 +29,7 @@ $config = [
 ### 基本用法 - 获取用户信息
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Wechat\MiniProgram\WechatMiniProgramFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\MiniProgram\WechatMiniProgramFacade;
 
 // 登录参数
 $params = [
@@ -65,7 +65,7 @@ echo "Session Key: " . $sessionKey . "\n";
 ### 使用集合对象格式返回
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Wechat\MiniProgram\WechatMiniProgramFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\MiniProgram\WechatMiniProgramFacade;
 
 $params = [
     'code' => '0e3q2k0004L9O90g0000000000',
@@ -86,7 +86,7 @@ echo "AppID: " . $result->appid . "\n";
 ### 完整的登录流程
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Wechat\MiniProgram\WechatMiniProgramFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\MiniProgram\WechatMiniProgramFacade;
 use YouHuJun\Tool\App\Exceptions\CommonException;
 
 // 从小程序前端获取的code
@@ -186,7 +186,7 @@ $result = WechatMiniProgramFacade::getOpenIdByCode($params, $config);
 
 ```php
 use YouHuJun\Tool\App\Exceptions\CommonException;
-use YouHuJun\Tool\App\Facade\V1\Wechat\MiniProgram\WechatMiniProgramFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\MiniProgram\WechatMiniProgramFacade;
 
 try {
     $result = WechatMiniProgramFacade::getOpenIdByCode($params, $config);

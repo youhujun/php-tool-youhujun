@@ -30,7 +30,7 @@ $config = [
 根据经纬度查询详细地址信息：
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Map\Tencent\TencentMapFacade;
+use YouHuJun\Tool\App\Facades\V1\Map\Tencent\TencentMapFacade;
 
 $config = [
     'key' => 'YOUR_TENCENT_MAP_KEY',
@@ -239,7 +239,7 @@ try {
 
 require_once 'vendor/autoload.php';
 
-use YouHuJun\Tool\App\Facade\V1\Map\Tencent\TencentMapFacade;
+use YouHuJun\Tool\App\Facades\V1\Map\Tencent\TencentMapFacade;
 use YouHuJun\Tool\App\Exceptions\CommonException;
 
 // 配置

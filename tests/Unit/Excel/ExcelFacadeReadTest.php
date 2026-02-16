@@ -3,7 +3,7 @@
 namespace Tests\Unit\Excel;
 
 use PHPUnit\Framework\TestCase;
-use YouHuJun\Tool\App\Facade\V1\Excel\ExcelFacade;
+use YouHuJun\Tool\App\Facades\V1\Excel\ExcelFacade;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx as WriteXlsx;
 

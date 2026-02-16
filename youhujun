@@ -38,16 +38,16 @@ function showHelp()
     echo "  make:service   只生成 Service 文件\n";
     echo "  call:facade    同时生成 Facade 和 Service 文件\n\n";
     echo "路径格式:\n";
-    echo "  Facade/V1/模块/类名          生成 Facade\n";
-    echo "  Service/V1/模块/类名         生成 Service\n";
+    echo "  Facades/V1/模块/类名          生成 Facade\n";
+    echo "  Services/V1/模块/类名         生成 Service\n";
     echo "  V1/模块/类名                生成 Facade + Service\n\n";
     echo "说明:\n";
-    echo "  - Facade 基础路径是: App/Facade\n";
-    echo "  - Service 基础路径是: App/Service\n";
+    echo "  - Facade 基础路径是: App/Facades\n";
+    echo "  - Service 基础路径是: App/Services\n";
     echo "  - V1 是版本号,在基础路径之后\n\n";
     echo "示例:\n";
-    echo "  php youhujun make:facade Facade/V1/Wechat/Official/WechatOfficialWebAuth\n";
-    echo "  php youhujun make:service Service/V1/Wechat/Official/WechatOfficialWebAuth\n";
+    echo "  php youhujun make:facade Facades/V1/Wechat/Official/WechatOfficialWebAuth\n";
+    echo "  php youhujun make:service Services/V1/Wechat/Official/WechatOfficialWebAuth\n";
     echo "  php youhujun call:facade V1/Wechat/Official/WechatOfficialWebAuth \"描述信息\"\n\n";
 }
 
@@ -73,7 +73,7 @@ try {
 
     switch ($command) {
         case 'make:facade':
-            // make:facade Facade/V1/Wechat/Official/WechatOfficialWebAuth
+            // make:facade Facades/V1/Wechat/Official/WechatOfficialWebAuth
             if (empty($fullPath)) {
                 echo "错误: 请提供路径参数\n";
                 exit(1);
@@ -82,7 +82,7 @@ try {
             break;
 
         case 'make:service':
-            // make:service Service/V1/Wechat/Official/WechatOfficialWebAuth
+            // make:service Services/V1/Wechat/Official/WechatOfficialWebAuth
             if (empty($fullPath)) {
                 echo "错误: 请提供路径参数\n";
                 exit(1);

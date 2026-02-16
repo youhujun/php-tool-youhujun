@@ -15,7 +15,7 @@ composer require qiniu/php-sdk
 ## 安装
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 ```
 
 ## 快速开始
@@ -25,7 +25,7 @@ use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
 在使用静态门面之前,需要先初始化配置:
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 // 初始化七牛云配置
 QiNiuFacade::init(
@@ -75,7 +75,7 @@ QiNiuFacade::init(string $accessKey, string $secretKey, ?string $cdnUrl = null, 
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 QiNiuFacade::init(
     'YOUR_QINIU_ACCESS_KEY',
@@ -120,7 +120,7 @@ QiNiuFacade::uploadFile(
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 // 基础上传
 $result = QiNiuFacade::uploadFile(
@@ -180,7 +180,7 @@ QiNiuFacade::uploadData(
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 // 上传字符串
 $content = 'Hello, Qiniu Cloud!';
@@ -237,7 +237,7 @@ QiNiuFacade::getPrivateFileUrl(string $savePath, ?int $expires = null): string
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 // 获取默认有效期(1小时)的下载链接
 $url = QiNiuFacade::getPrivateFileUrl('images/2025/01/photo.jpg');
@@ -273,7 +273,7 @@ QiNiuFacade::getPublicFileUrl(string $savePath): string
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 $url = QiNiuFacade::getPublicFileUrl('images/2025/01/photo.jpg');
 echo $url;
@@ -306,7 +306,7 @@ QiNiuFacade::deleteFile(string $bucket, string $savePath): bool
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 $success = QiNiuFacade::deleteFile('my-bucket', 'images/2025/01/photo.jpg');
 
@@ -346,7 +346,7 @@ QiNiuFacade::getFileInfo(string $bucket, string $savePath): array
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 $fileInfo = QiNiuFacade::getFileInfo('my-bucket', 'images/2025/01/photo.jpg');
 
@@ -382,7 +382,7 @@ QiNiuFacade::getUploadToken(string $bucket, ?string $keyToOverwrite = null): str
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 // 获取上传凭证(不覆盖)
 $token = QiNiuFacade::getUploadToken('my-bucket');
@@ -424,7 +424,7 @@ QiNiuFacade::setReturnBody('{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"n
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 // 初始化配置
 QiNiuFacade::init(
@@ -461,7 +461,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Service\V1\Store\QiNiuFacadeService;
+use YouHuJun\Tool\App\Services\V1\Store\QiNiuFacadeService;
 
 // 创建服务实例
 $qiNiuService = new QiNiuFacadeService(
@@ -495,7 +495,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 /**
  * 上传用户头像
@@ -541,7 +541,7 @@ if ($fileKey) {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 // 初始化配置
 QiNiuFacade::init(
@@ -603,7 +603,7 @@ print_r($uploadedFiles);
 ### 错误处理示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Store\QiNiuFacade;
+use YouHuJun\Tool\App\Facades\V1\Store\QiNiuFacade;
 
 try {
     $result = QiNiuFacade::uploadFile('/path/to/file.jpg', 'my-bucket', 'test.jpg');

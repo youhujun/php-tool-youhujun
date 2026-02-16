@@ -29,7 +29,7 @@ $config = [
 ### 1. 获取授权URL
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Wechat\Official\WechatOfficialWebAuthFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\Official\WechatOfficialWebAuthFacade;
 
 // 准备配置
 $config = [
@@ -52,7 +52,7 @@ return redirect($authUrl);
 ### 2. 处理回调并获取用户信息
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Wechat\Official\WechatOfficialWebAuthFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\Official\WechatOfficialWebAuthFacade;
 
 // 准备配置
 $config = [
@@ -97,7 +97,7 @@ $result = WechatOfficialWebAuthFacade::authorize(
 ```php
 namespace App\Http\Controllers;
 
-use YouHuJun\Tool\App\Facade\V1\Wechat\Official\WechatOfficialWebAuthFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\Official\WechatOfficialWebAuthFacade;
 use App\Models\User;
 
 class WechatAuthController extends Controller
@@ -170,7 +170,7 @@ class WechatAuthController extends Controller
 ```php
 namespace App\Services;
 
-use YouHuJun\Tool\App\Facade\V1\Wechat\Official\WechatOfficialWebAuthFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\Official\WechatOfficialWebAuthFacade;
 
 class WechatAuthService
 {
@@ -244,7 +244,7 @@ class WechatAuthService
 ```php
 namespace App\Http\Controllers;
 
-use YouHuJun\Tool\App\Facade\V1\Wechat\Official\WechatOfficialWebAuthFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\Official\WechatOfficialWebAuthFacade;
 
 class WechatAuthController extends Controller
 {

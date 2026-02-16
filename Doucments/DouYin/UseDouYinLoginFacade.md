@@ -7,7 +7,7 @@
 ## 安装
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\DouYin\Login\DouYinLoginFacade;
+use YouHuJun\Tool\App\Facades\V1\DouYin\Login\DouYinLoginFacade;
 ```
 
 ## 功能方法
@@ -58,7 +58,7 @@ DouYinLoginFacade::getOpenIdByCodeWithMiniGame(array $params, array $config): ar
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\DouYin\Login\DouYinLoginFacade;
+use YouHuJun\Tool\App\Facades\V1\DouYin\Login\DouYinLoginFacade;
 
 // 参数配置
 $params = [
@@ -140,7 +140,7 @@ DouYinLoginFacade::getOpenIdByCodeWithMiniProgram(array $params, array $config):
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\DouYin\Login\DouYinLoginFacade;
+use YouHuJun\Tool\App\Facades\V1\DouYin\Login\DouYinLoginFacade;
 
 // 参数配置
 $params = [
@@ -190,7 +190,7 @@ try {
 ### 错误处理示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\DouYin\Login\DouYinLoginFacade;
+use YouHuJun\Tool\App\Facades\V1\DouYin\Login\DouYinLoginFacade;
 
 try {
     $result = DouYinLoginFacade::getOpenIdByCodeWithMiniProgram($params, $config);
@@ -235,7 +235,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\DouYin\Login\DouYinLoginFacade;
+use YouHuJun\Tool\App\Facades\V1\DouYin\Login\DouYinLoginFacade;
 
 /**
  * 抖音小程序登录处理

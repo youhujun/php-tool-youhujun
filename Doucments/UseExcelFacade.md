@@ -9,7 +9,7 @@
 ### 基本导出
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Excel\ExcelFacade;
+use YouHuJun\Tool\App\Facades\V1\Excel\ExcelFacade;
 
 // 准备数据
 $column = [['姓名', '年龄', '性别']];
@@ -31,7 +31,7 @@ ExcelFacade::exportExcelData(
 ### 直接下载
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Excel\ExcelFacade;
+use YouHuJun\Tool\App\Facades\V1\Excel\ExcelFacade;
 
 // 准备数据
 $column = [['姓名', '年龄', '性别']];
@@ -54,7 +54,7 @@ ExcelFacade::exportExcelData(
 ### 初始化读取
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Excel\ExcelFacade;
+use YouHuJun\Tool\App\Facades\V1\Excel\ExcelFacade;
 
 // 初始化Excel文件
 ExcelFacade::initReadExcel(storage_path('app/excel/用户列表.xlsx'));
@@ -103,7 +103,7 @@ $allDataByColumn = ExcelFacade::getDataByColumn();
 ```php
 namespace App\Http\Controllers;
 
-use YouHuJun\Tool\App\Facade\V1\Excel\ExcelFacade;
+use YouHuJun\Tool\App\Facades\V1\Excel\ExcelFacade;
 
 class UserController extends Controller
 {
@@ -158,7 +158,7 @@ class UserController extends Controller
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use YouHuJun\Tool\App\Facade\V1\Excel\ExcelFacade;
+use YouHuJun\Tool\App\Facades\V1\Excel\ExcelFacade;
 
 class UserController extends Controller
 {

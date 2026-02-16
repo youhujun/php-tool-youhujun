@@ -15,7 +15,7 @@
 ## 安装
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 ```
 
 ## 快速开始
@@ -23,7 +23,7 @@ use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
 ### 生成雪花ID
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 
 // 最简单的调用（使用默认配置）
 $userId = SnowflakeFacade::generate();
@@ -56,7 +56,7 @@ SnowflakeFacade::generate(?int $machineId = null, ?string $startTime = null): in
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 
 // 基础调用 - 使用默认配置
 $userId = SnowflakeFacade::generate();
@@ -88,7 +88,7 @@ SnowflakeFacade::id(?int $machineId = null, ?string $startTime = null): int
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 
 // 与 generate() 方法功能相同
 $userId = SnowflakeFacade::id();
@@ -126,7 +126,7 @@ SnowflakeFacade::parse(string|int $id, ?int $machineId = null, ?string $startTim
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 
 // 生成ID
 $snowflakeId = SnowflakeFacade::generate(1, '2025-01-01 00:00:00');
@@ -154,7 +154,7 @@ print_r($detail);
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 
 /**
  * 生成用户ID
@@ -182,7 +182,7 @@ echo "新用户ID: " . $userId . "\n";
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 
 /**
  * 生成订单ID
@@ -215,7 +215,7 @@ echo "服务器3订单ID: " . $orderId3 . "\n";
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 
 /**
  * 业务ID生成器
@@ -275,7 +275,7 @@ echo "支付ID: " . BusinessIdGenerator::generatePaymentId() . "\n";
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 
 /**
  * 批量生成ID
@@ -306,7 +306,7 @@ foreach ($userIds as $index => $id) {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 
 /**
  * 解析雪花ID并格式化输出
@@ -454,7 +454,7 @@ $storedId = $user->id;  // 已是int类型
 ### 3. 错误处理
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Snowflake\SnowflakeFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Snowflake\SnowflakeFacade;
 
 try {
     $id = SnowflakeFacade::generate($machineId);

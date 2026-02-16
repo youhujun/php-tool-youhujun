@@ -35,7 +35,7 @@ $config = [
 发起JSAPI支付下单请求：
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Wechat\Pay\JSAPI\WechatPayByJSAPIFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\Pay\JSAPI\WechatPayByJSAPIFacade;
 
 $config = [
     'merchantId' => '1234567890',

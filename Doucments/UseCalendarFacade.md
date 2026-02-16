@@ -9,7 +9,7 @@
 ### 数组格式转换
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Calendar\CalendarFacade;
+use YouHuJun\Tool\App\Facades\V1\Calendar\CalendarFacade;
 
 // 将农历 2023年11月25日 转换为阳历
 $solar = CalendarFacade::lunarToSolar(2023, 11, 25);
@@ -21,7 +21,7 @@ echo $solar[0] . '-' . $solar[1] . '-' . $solar[2];
 ### 字符串格式转换
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Calendar\CalendarFacade;
+use YouHuJun\Tool\App\Facades\V1\Calendar\CalendarFacade;
 
 // 将农历日期字符串转换为阳历日期字符串
 $solarStr = CalendarFacade::lunarToSolarString('2023-11-25');
@@ -35,7 +35,7 @@ echo $solarStr;
 ### 数组格式转换
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Calendar\CalendarFacade;
+use YouHuJun\Tool\App\Facades\V1\Calendar\CalendarFacade;
 
 // 将阳历 2024年1月6日 转换为农历
 $lunar = CalendarFacade::solarToLunar(2024, 1, 6);
@@ -47,7 +47,7 @@ print_r($lunar);
 ### 字符串格式转换
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Calendar\CalendarFacade;
+use YouHuJun\Tool\App\Facades\V1\Calendar\CalendarFacade;
 
 // 将阳历日期字符串转换为农历日期字符串
 $lunarStr = CalendarFacade::solarToLunarString('2024-01-06');
@@ -63,7 +63,7 @@ echo $lunarStr;
 ```php
 namespace App\Http\Controllers;
 
-use YouHuJun\Tool\App\Facade\V1\Calendar\CalendarFacade;
+use YouHuJun\Tool\App\Facades\V1\Calendar\CalendarFacade;
 
 class UserController extends Controller
 {
@@ -87,7 +87,7 @@ class UserController extends Controller
 ```php
 namespace App\Http\Controllers;
 
-use YouHuJun\Tool\App\Facade\V1\Calendar\CalendarFacade;
+use YouHuJun\Tool\App\Facades\V1\Calendar\CalendarFacade;
 
 class HomeController extends Controller
 {
@@ -113,7 +113,7 @@ class HomeController extends Controller
 ```php
 namespace App\Services;
 
-use YouHuJun\Tool\App\Facade\V1\Calendar\CalendarFacade;
+use YouHuJun\Tool\App\Facades\V1\Calendar\CalendarFacade;
 
 class HolidayService
 {
@@ -151,7 +151,7 @@ class HolidayService
 ```php
 namespace App\Services;
 
-use YouHuJun\Tool\App\Facade\V1\Calendar\CalendarFacade;
+use YouHuJun\Tool\App\Facades\V1\Calendar\CalendarFacade;
 
 class BirthdayService
 {

@@ -7,6 +7,39 @@
 
 ---
 
+## [1.1.4] - 2026-02-17
+
+### 新增
+
+#### 功能模块
+- **密钥管理服务**: 提供安全密钥生成功能,支持自定义字符类型和长度
+- **认证签名服务**: 提供 HMAC-SHA256 签名生成功能,用于API接口认证和数据完整性校验
+
+#### 命令行工具
+- 新增 `php youhujun make:facade` 命令 - 生成 Facade 文件
+- 新增 `php youhujun make:service` 命令 - 生成 Service 文件
+- 新增 `php youhujun call:facade` 命令 - 同时生成 Facade 和 Service 文件
+- 支持自定义路径和版本号,快速生成门面代理类
+
+#### 文档
+- 新增 `Doucments/Utils/Sign/UseKeyManagerFacade.md` - 密钥管理服务使用文档
+- 新增 `Doucments/Utils/Sign/UseAuthSignFacade.md` - 认证签名服务使用文档
+- 新增 `Doucments/COMMANDS.md` - 命令行工具使用文档
+
+### 优化
+- 统一 Facade 类命名规范,使用单数形式(如 `KeyManagerFacade` 而非 `KeyManagerFacades`)
+- 统一 Service 类命名规范,移除 `Facade` 前缀(如 `KeyManagerService` 而非 `KeyManagerFacadeService`)
+- 优化命令行工具生成逻辑,修正文件路径和类名生成问题
+- 完善代码注释,统一文档格式和风格
+
+### 新增服务类
+- `YouHuJun\Tool\App\Facades\V1\Utils\Sign\KeyManagerFacade` - 密钥管理门面
+- `YouHuJun\Tool\App\Service\V1\Utils\Sign\KeyManagerFacadeService` - 密钥管理服务
+- `YouHuJun\Tool\App\Facades\V1\Utils\Sign\AuthSignFacade` - 认证签名门面
+- `YouHuJun\Tool\App\Service\V1\Utils\Sign\AuthSignFacadeService` - 认证签名服务
+
+---
+
 ## [1.1.3] - 2026-01-14
 
 ### 新增

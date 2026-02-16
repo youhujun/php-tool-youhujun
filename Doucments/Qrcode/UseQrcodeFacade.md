@@ -38,7 +38,7 @@ $params = [
 ### 基本用法 - 生成简单二维码
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Qrcode\QrcodeFacade;
+use YouHuJun\Tool\App\Facades\V1\Qrcode\QrcodeFacade;
 
 $config = [];
 $params = [
@@ -179,7 +179,7 @@ $result = QrcodeFacade::makeQrcode($config, $params, 3);
 
 ```php
 use YouHuJun\Tool\App\Exceptions\CommonException;
-use YouHuJun\Tool\App\Facade\V1\Qrcode\QrcodeFacade;
+use YouHuJun\Tool\App\Facades\V1\Qrcode\QrcodeFacade;
 
 try {
     $result = QrcodeFacade::makeQrcode($config, $params, 3);
@@ -206,7 +206,7 @@ try {
 ### 批量生成二维码
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Qrcode\QrcodeFacade;
+use YouHuJun\Tool\App\Facades\V1\Qrcode\QrcodeFacade;
 use YouHuJun\Tool\App\Exceptions\CommonException;
 
 $users = [
@@ -242,7 +242,7 @@ foreach ($users as $user) {
 ### 动态生成二维码接口
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Qrcode\QrcodeFacade;
+use YouHuJun\Tool\App\Facades\V1\Qrcode\QrcodeFacade;
 use YouHuJun\Tool\App\Exceptions\CommonException;
 
 // 在Controller或路由中使用

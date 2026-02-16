@@ -7,7 +7,7 @@ AES加解密服务提供了 AES 算法的加密和解密功能,支持多种加�
 ## 安装
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\AESFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\AESFacade;
 ```
 
 ## 功能方法
@@ -47,7 +47,7 @@ AESFacade::encrypt(string $data, string $key, ?string $method = null, ?string $i
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\AESFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\AESFacade;
 
 try {
     // 基础加密 - 使用默认参数
@@ -99,7 +99,7 @@ AESFacade::decrypt(string $data, string $key, ?string $method = null, ?string $i
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\AESFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\AESFacade;
 
 try {
     // 基础解密 - 使用默认参数
@@ -132,7 +132,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\AESFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\AESFacade;
 
 // 待加密的数据
 $originalData = '这是一段需要加密的敏感数据';
@@ -162,7 +162,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Service\V1\Utils\Secret\AESFacadeService;
+use YouHuJun\Tool\App\Services\V1\Utils\Secret\AESFacadeService;
 
 // 创建服务实例
 $aesService = new AESFacadeService();
@@ -193,7 +193,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Service\V1\Utils\Secret\AESFacadeService;
+use YouHuJun\Tool\App\Services\V1\Utils\Secret\AESFacadeService;
 
 // 通过构造函数初始化
 $aesService = new AESFacadeService('AES-128-CBC', 'my-custom-iv-123');
@@ -217,7 +217,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\AESFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\AESFacade;
 
 /**
  * 加密用户敏感信息
@@ -283,7 +283,7 @@ echo "解密结果: " . $decrypted;
 ### 错误处理示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\AESFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\AESFacade;
 
 try {
     $encrypted = AESFacade::encrypt($data, $key);

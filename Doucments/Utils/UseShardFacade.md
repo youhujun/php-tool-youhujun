@@ -15,7 +15,7 @@
 ## 安装
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 ```
 
 ## 快速开始
@@ -23,7 +23,7 @@ use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
 ### 基础使用
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 // 配置分片规则
 ShardFacade::setConfig([
@@ -71,7 +71,7 @@ ShardFacade::calc(string|int $uid): array
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 // 配置分片规则
 ShardFacade::setConfig([
@@ -118,7 +118,7 @@ ShardFacade::getTableName(string|int $uid, string $baseTable): string
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 ShardFacade::setConfig([
     'db_count' => 2,
@@ -175,7 +175,7 @@ ShardFacade::getDbName(string|int $uid): string
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 ShardFacade::setConfig([
     'db_count' => 4,
@@ -218,7 +218,7 @@ ShardFacade::getShardKey(string|int $uid): int
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 ShardFacade::setConfig([
     'table_count' => 8,
@@ -261,7 +261,7 @@ ShardFacade::setConfig(array $config): void
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 // 设置完整配置
 ShardFacade::setConfig([
@@ -286,7 +286,7 @@ ShardFacade::getConfig(string $key, mixed $default = null): mixed
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 ShardFacade::setConfig([
     'db_count' => 4,
@@ -311,7 +311,7 @@ $customValue = ShardFacade::getConfig('custom_key', 'default_value'); // default
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 class UserRepository
 {
@@ -388,7 +388,7 @@ $user = $repo->getUser(1001);
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 class OrderRepository
 {
@@ -464,7 +464,7 @@ $orders = $orderRepo->getUserOrders(2002);
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 class FeedRepository
 {
@@ -539,7 +539,7 @@ $feedRepo->publishFeed(3003, '这是一条新的动态内容');
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Shard\ShardFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Shard\ShardFacade;
 
 // 全局统一分片配置（应用启动时配置一次）
 ShardFacade::setConfig([

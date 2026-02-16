@@ -83,15 +83,15 @@ class GeneratorCommand
         $className = $this->sanitizeClassName($className);
         $facadeClassName = $className;
 
-        // 移除已有的 Facade 后缀以避免重复
-        $facadeClassName = preg_replace('/Facade$/', '', $facadeClassName);
+        // 确保以 Facade 结尾(单数形式)
+        $facadeClassName = preg_replace('/Facades?$/', '', $facadeClassName);
         $facadeClassName .= 'Facade';
 
         // 对应的 Service 类名
-        $serviceClassName = $facadeClassName . 'Service';
+        $serviceClassName = $className . 'Service';
 
         // 生成目录路径 - 基础路径是 Facade, 不包含 V1
-        $facadeDir = $this->basePath . '/src/App/Facade/' . $version . ($modulePath ? '/' . $modulePath : '');
+        $facadeDir = $this->basePath . '/src/App/Facades/' . $version . ($modulePath ? '/' . $modulePath : '');
 
         // 创建目录
         $this->ensureDirectoryExists($facadeDir);
@@ -138,12 +138,12 @@ class GeneratorCommand
         // 清理类名
         $className = $this->sanitizeClassName($className);
 
-        // 确保以 FacadeService 结尾
-        $className = preg_replace('/FacadeService$/', '', $className);
-        $className .= 'FacadeService';
+        // 确保以 Service 结尾
+        $className = preg_replace('/Service$/', '', $className);
+        $className .= 'Service';
 
         // 生成目录路径 - 基础路径是 Service, 不包含 V1
-        $serviceDir = $this->basePath . '/src/App/Service/' . $version . ($modulePath ? '/' . $modulePath : '');
+        $serviceDir = $this->basePath . '/src/App/Services/' . $version . ($modulePath ? '/' . $modulePath : '');
 
         // 创建目录
         $this->ensureDirectoryExists($serviceDir);
@@ -197,8 +197,6 @@ class GeneratorCommand
      */
     private function sanitizeClassName(string $name): string
     {
-        // 移除已有的后缀
-        $name = str_replace(['Facade', 'FacadeService'], '', $name);
         // 只保留字母、数字和下划线
         return preg_replace('/[^a-zA-Z0-9_]/', '', $name);
     }

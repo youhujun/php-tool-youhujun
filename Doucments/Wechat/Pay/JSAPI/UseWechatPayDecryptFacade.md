@@ -30,7 +30,7 @@ $config = [
 处理微信支付回调时，验证签名并解密回调数据：
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Wechat\Pay\JSAPI\WechatPayDecryptFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\Pay\JSAPI\WechatPayDecryptFacade;
 
 $config = [
     'apiv3Key' => 'YOUR_WECHAT_PAY_API_V3_KEY',
@@ -229,7 +229,7 @@ try {
 
 require_once 'vendor/autoload.php';
 
-use YouHuJun\Tool\App\Facade\V1\Wechat\Pay\JSAPI\WechatPayDecryptFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\Pay\JSAPI\WechatPayDecryptFacade;
 use YouHuJun\Tool\App\Exceptions\CommonException;
 
 // 配置

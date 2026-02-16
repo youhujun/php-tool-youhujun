@@ -6,7 +6,7 @@
  * @Date: {{Date}}
  * @LastEditors: youhujun youhu8888@163.com
  * @LastEditTime: {{Date}}
- * @FilePath: App\Service\V1{{ModulePath}}\{{ServiceClass}}.php
+ * @FilePath: App\Services\V1{{ModulePath}}\{{ServiceClass}}.php
  * Copyright (C) {{Year}} youhujun. All rights reserved.
  */
 

@@ -7,7 +7,7 @@ RSA加解密服务提供了 RSA 非对称加密算法的公钥加密和私钥解
 ## 安装
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\RSAFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\RSAFacade;
 ```
 
 ## 功能方法
@@ -55,7 +55,7 @@ RSAFacade::encrypt(
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\RSAFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\RSAFacade;
 
 // 假设这是从文件或配置中读取的公钥
 $publicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...';
@@ -116,7 +116,7 @@ RSAFacade::decrypt(
 #### 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\RSAFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\RSAFacade;
 
 // 假设这是从文件或配置中读取的私钥
 $privateKey = 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...';
@@ -156,7 +156,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\RSAFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\RSAFacade;
 
 // 假设这是你的公钥和私钥
 $publicKey = 'YOUR_PUBLIC_KEY_BASE64';
@@ -188,7 +188,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Service\V1\Utils\Secret\RSAFacadeService;
+use YouHuJun\Tool\App\Services\V1\Utils\Secret\RSAFacadeService;
 
 // 创建服务实例
 $rsaService = new RSAFacadeService();
@@ -216,7 +216,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\RSAFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\RSAFacade;
 
 /**
  * 从文件读取PEM格式密钥
@@ -255,7 +255,7 @@ try {
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\RSAFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\RSAFacade;
 
 /**
  * 加密API请求数据
@@ -336,7 +336,7 @@ print_r($responseData);
 ### 错误处理示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\RSAFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\RSAFacade;
 
 try {
     $encrypted = RSAFacade::encrypt($data, $publicKey);
@@ -435,8 +435,8 @@ RSA + AES 混合加密,适合加密大数据:
 ```php
 <?php
 
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\AESFacade;
-use YouHuJun\Tool\App\Facade\V1\Utils\Secret\RSAFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\AESFacade;
+use YouHuJun\Tool\App\Facades\V1\Utils\Secret\RSAFacade;
 
 /**
  * 混合加密: RSA加密AES密钥, AES加密数据

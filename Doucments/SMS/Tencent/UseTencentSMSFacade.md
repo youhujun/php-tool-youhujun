@@ -46,7 +46,7 @@ $smsParam = [
 ### 基本用法
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\SMS\Tencent\TencentSMSFacade;
+use YouHuJun\Tool\App\Facades\V1\SMS\Tencent\TencentSMSFacade;
 
 // 配置腾讯云参数
 $config = [
@@ -148,7 +148,7 @@ $result2 = TencentSMSFacade::sendSms($config, $smsParam2);
 
 ```php
 use YouHuJun\Tool\App\Exceptions\CommonException;
-use YouHuJun\Tool\App\Facade\V1\SMS\Tencent\TencentSMSFacade;
+use YouHuJun\Tool\App\Facades\V1\SMS\Tencent\TencentSMSFacade;
 
 try {
     $result = TencentSMSFacade::sendSms($config, $smsParam);

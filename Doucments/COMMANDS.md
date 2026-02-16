@@ -32,13 +32,13 @@ php tool call:facade <路径> [描述]
 
 | 路径格式 | 生成内容 | 基础路径 |
 |----------|----------|-----------|
-| `Facade/V1/模块/类名` | 只生成 Facade | `App/Facade` |
-| `Service/V1/模块/类名` | 只生成 Service | `App/Service` |
-| `V1/模块/类名` | 生成 Facade + Service | `App/Facade` 和 `App/Service` |
+| `V1/模块/类名` | 只生成 Facade | `src/App/Facades` |
+| `V1/模块/类名` | 只生成 Service | `src/App/Services` |
+| `V1/模块/类名` | 生成 Facade + Service | `src/App/Facades` 和 `src/App/Services` |
 
 **说明:**
-- Facade 基础路径是: `App/Facade`
-- Service 基础路径是: `App/Service`
+- Facade 基础路径是: `src/App/Facades`
+- Service 基础路径是: `src/App/Services`
 - V1 是版本号,在基础路径之后
 
 ## 使用示例
@@ -47,30 +47,30 @@ php tool call:facade <路径> [描述]
 
 ```bash
 # 使用 youhujun 前缀
-php youhujun make:facade Facade/V1/Wechat/Official/WechatOfficialWebAuth
+php youhujun make:facade V1/Wechat/Official/WechatOfficialWebAuth
 
 # 使用 tool 前缀
-php tool make:facade Facade/V1/Wechat/Official/WechatOfficialWebAuth
+php tool make:facade V1/Wechat/Official/WechatOfficialWebAuth
 ```
 
 生成文件:
 ```
-src/App/Facade/V1/Wechat/Official/WechatOfficialWebAuthFacade.php
+src/App/Facades/V1/Wechat/Official/WechatOfficialWebAuthFacade.php
 ```
 
 ### 生成 Service
 
 ```bash
 # 使用 youhujun 前缀
-php youhujun make:service Service/V1/Wechat/Official/WechatOfficialWebAuth "微信公众号网页授权服务"
+php youhujun make:service V1/Wechat/Official/WechatOfficialWebAuth "微信公众号网页授权服务"
 
 # 使用 tool 前缀
-php tool make:service Service/V1/Wechat/Official/WechatOfficialWebAuth "微信公众号网页授权服务"
+php tool make:service V1/Wechat/Official/WechatOfficialWebAuth "微信公众号网页授权服务"
 ```
 
 生成文件:
 ```
-src/App/Service/V1/Wechat/Official/WechatOfficialWebAuthFacadeService.php
+src/App/Services/V1/Wechat/Official/WechatOfficialWebAuthService.php
 ```
 
 ### 同时生成 Facade 和 Service
@@ -85,8 +85,8 @@ php tool call:facade V1/Calendar/CalendarConverter "日历转换服务"
 
 生成文件:
 ```
-src/App/Facade/V1/Calendar/CalendarConverterFacade.php
-src/App/Service/V1/Calendar/CalendarConverterFacadeService.php
+src/App/Facades/V1/Calendar/CalendarConverterFacade.php
+src/App/Services/V1/Calendar/CalendarConverterService.php
 ```
 
 ### 查看帮助
@@ -101,19 +101,19 @@ php tool
 
 | 命令 | 输入路径 | 生成文件 |
 |------|----------|----------|
-| `make:facade` | `Facade/V1/Wechat/Official/WechatOfficialWebAuth` | `src/App/Facade/V1/Wechat/Official/WechatOfficialWebAuthFacade.php` |
-| `make:service` | `Service/V1/Wechat/Official/WechatOfficialWebAuth` | `src/App/Service/V1/Wechat/Official/WechatOfficialWebAuthFacadeService.php` |
-| `call:facade` | `V1/Calendar/CalendarConverter` | `src/App/Facade/V1/Calendar/CalendarConverterFacade.php`<br>`src/App/Service/V1/Calendar/CalendarConverterFacadeService.php` |
+| `make:facade` | `V1/Wechat/Official/WechatOfficialWebAuth` | `src/App/Facades/V1/Wechat/Official/WechatOfficialWebAuthFacade.php` |
+| `make:service` | `V1/Wechat/Official/WechatOfficialWebAuth` | `src/App/Services/V1/Wechat/Official/WechatOfficialWebAuthService.php` |
+| `call:facade` | `V1/Calendar/CalendarConverter` | `src/App/Facades/V1/Calendar/CalendarConverterFacade.php`<br>`src/App/Services/V1/Calendar/CalendarConverterService.php` |
 
 ## Facade 使用示例
 
 ```php
-use YouHuJun\Tool\App\Facade\V1\Wechat\Official\WechatOfficialWebAuthFacade;
+use YouHuJun\Tool\App\Facades\V1\Wechat\Official\WechatOfficialWebAuthFacade;
 
 // 静态调用
 $result = WechatOfficialWebAuthFacade::someMethod($param);
 
 // 测试时注入实例
-$service = new WechatOfficialWebAuthFacadeService();
+$service = new WechatOfficialWebAuthService();
 WechatOfficialWebAuthFacade::setInstance($service);
 ```

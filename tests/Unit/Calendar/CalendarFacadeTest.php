@@ -3,8 +3,8 @@
 namespace Tests\Unit\Calendar;
 
 use PHPUnit\Framework\TestCase;
-use YouHuJun\Tool\App\Facade\V1\Calendar\CalendarFacade;
-use YouHuJun\Tool\App\Service\V1\Calendar\CalendarFacadeService;
+use YouHuJun\Tool\App\Facades\V1\Calendar\CalendarFacade;
+use YouHuJun\Tool\App\Services\V1\Calendar\CalendarFacadeService;
 use YouHuJun\Tool\App\Exceptions\CommonException;
 
 class CalendarFacadeTest extends TestCase
