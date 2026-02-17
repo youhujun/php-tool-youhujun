@@ -12,7 +12,7 @@
 
 namespace YouHuJun\Tool\App\Facades\V1\Utils\Sign;
 
-use YouHuJun\Tool\App\Service\V1\Utils\Sign\KeyManagerFacadeService;
+use YouHuJun\Tool\App\Services\V1\Utils\Sign\KeyManagerFacadeService;
 
 /**
  * 密钥管理服务静态门面类

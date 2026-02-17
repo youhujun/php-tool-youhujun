@@ -4,15 +4,15 @@
  * @version: v1
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-02-17 02:49:09
- * @LastEditors: youhujun youhu8888@163.com
- * @LastEditTime: 2026-02-17 02:49:09
- * @FilePath: App.Facade.V1.Utils.Sign.AuthSignFacade.php
+ * @LastEditors: youhujun youhu8888@163.com & xueer
+ * @LastEditTime: 2026-02-17 15:36:45
+ * @FilePath: \php-tool-youhujun\src\App\Facades\V1\Utils\Sign\AuthSignFacade.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
 
 namespace YouHuJun\Tool\App\Facades\V1\Utils\Sign;
 
-use YouHuJun\Tool\App\Service\V1\Utils\Sign\AuthSignFacadeService;
+use YouHuJun\Tool\App\Services\V1\Utils\Sign\AuthSignFacadeService;
 
 /**
  * 认证签名服务静态门面类

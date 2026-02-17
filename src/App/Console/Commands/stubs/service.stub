@@ -4,13 +4,13 @@
  * @version: v1
  * @Author: youhujun youhu8888@163.com
  * @Date: {{Date}}
- * @LastEditors: youhujun youhu8888@163.com
- * @LastEditTime: {{Date}}
- * @FilePath: App\Services\V1{{ModulePath}}\{{ServiceClass}}.php
+ * @LastEditors: youhujun youhu8888@163.com & xueer
+ * @LastEditTime: 2026-02-17 15:38:39
+ * @FilePath: \php-tool-youhujun\src\App\Console\Commands\stubs\service.stub
  * Copyright (C) {{Year}} youhujun. All rights reserved.
  */
 
-namespace {{Namespace}}\Service\V1{{ModulePath}};
+namespace {{Namespace}}\Services\V1{{ModulePath}};
 
 class {{ServiceClass}}
 {

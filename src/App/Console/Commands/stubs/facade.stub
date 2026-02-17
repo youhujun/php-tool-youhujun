@@ -1,39 +1,43 @@
 <?php
-namespace {{Namespace}}\Facade\V1{{ModulePath}};
+namespace {{Namespace}}\Facades\V1{{ModulePath}};
 
-use {{Namespace}}\Service\V1{{ModulePath}}\{{ServiceClass}};
-use BadMethodCallException;
+use {{Namespace}}\Services\V1{{ModulePath}}\{{ServiceClass}};
 
-class {{FacadeClass}} 
+class {{FacadeClass}}
 {
-    protected static $instance;
+    /**
+     * 服务实例(单例)
+     *
+     * @var {{ServiceClass}}|null
+     */
+    private static ?{{ServiceClass}} $instance = null;
 
-    private function __construct() {}
-    private function __clone() {}
-
-    public static function setInstance({{ServiceClass}} $instance): void
+    /**
+     * 获取服务实例
+     *
+     * @return {{ServiceClass}}
+     */
+    private static function getInstance(): {{ServiceClass}}
     {
-        static::$instance = $instance;
-    }
-
-    public static function clearInstance(): void
-    {
-        static::$instance = null;
-    }
-
-    protected static function getInstance(): {{ServiceClass}}
-    {
-        if (static::$instance === null) {
-            static::$instance = new {{ServiceClass}}();
+        if (self::$instance === null) {
+            self::$instance = new {{ServiceClass}}();
         }
-        return static::$instance;
+
+        return self::$instance;
     }
 
+    /**
+     * 调用服务方法
+     *
+     * @param string $method 方法名
+     * @param array $parameters 参数
+     * @return mixed
+     */
     public static function __callStatic(string $method, array $parameters)
     {
         $instance = static::getInstance();
         if (!method_exists($instance, $method)) {
-            throw new BadMethodCallException(
+            throw new \BadMethodCallException(
                 sprintf('Call to undefined method %s::%s()', get_class($instance), $method)
             );
         }
