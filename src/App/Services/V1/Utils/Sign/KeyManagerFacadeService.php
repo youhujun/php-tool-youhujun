@@ -10,7 +10,7 @@
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
 
-namespace YouHuJun\Tool\App\Service\V1\Utils\Sign;
+namespace YouHuJun\Tool\App\Services\V1\Utils\Sign;
 
 /**
  * 密钥管理服务类
