@@ -4,9 +4,9 @@
  * @version: v1
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-01-06 00:01:25
- * @LastEditors: youhujun youhu8888@163.com
- * @LastEditTime: 2026-01-08 11:16:49
- * @FilePath: \src\config\error-codes.php
+ * @LastEditors: youhujun youhu8888@163.com & xueer
+ * @LastEditTime: 2026-02-27 08:09:50
+ * @FilePath: \youhu-laravel-api-12d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\config\error-codes.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
 
@@ -563,6 +563,17 @@ $qiNiuCodeArray = [
         'error' => 'QiNiuNotInitialized',
         'msg' => '七牛云服务未初始化'
     ],
+];
+
+//shard数据库分库分表
+$qiNiuCodeArray = [
+
+	'ShardKeyEmptyError' => [
+        'code' => 10000,
+        'error' => 'ShardKeyEmptyError',
+        'msg' => '分片标识未初始化'
+    ],
+
 ];
 
 $errorCodeArray = array_merge(

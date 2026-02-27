@@ -40,6 +40,38 @@
 
 ---
 
+## [1.1.5] - 2026-02-17
+
+### 新增
+
+#### 功能优化
+- **分片工具多配置支持**: ShardFacade 支持多配置模式,适配分库分表+微服务场景
+- **映射表分离**: 支持业务表和映射表使用不同分片配置
+- **微服务适配**: 每个微服务可配置独立的分片规则
+
+### 优化
+- 重构 ShardFacade 为多配置模式,所有方法强制传入 `configKey` 参数
+- 统一命名规范: `setConfig` → `setMultiConfig`, `getConfig` → `getMultiConfig`
+- 新增业务表与映射表分离的完整使用示例
+- 新增微服务场景多配置示例
+- 更新最佳实践部分,所有示例适配多配置模式
+
+### 变更
+- `ShardFacade::setConfig()` → `ShardFacade::setMultiConfig($configKey, $config)`
+- `ShardFacade::getConfig($key)` → `ShardFacade::getMultiConfig($configKey, $key)`
+- `ShardFacade::calc($uid)` → `ShardFacade::calc($uid, $configKey)`
+- `ShardFacade::getTableName($uid, $baseTable)` → `ShardFacade::getTableName($uid, $baseTable, $configKey)`
+- `ShardFacade::getDbName($uid)` → `ShardFacade::getDbName($uid, $configKey)`
+- `ShardFacade::getShardKey($uid)` → `ShardFacade::getShardKey($uid, $configKey)`
+
+#### 文档
+- 更新 `Doucments/Utils/UseShardFacade.md` - 完整适配多配置模式
+
+### 重要提示
+**破坏性变更**: 所有 ShardFacade 方法现在必须传入 `configKey` 参数,无默认值。请更新所有调用代码。
+
+---
+
 ## [1.1.3] - 2026-01-14
 
 ### 新增

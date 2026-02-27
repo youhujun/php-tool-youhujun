@@ -1,130 +1,92 @@
 <?php
-/*
- * @Descripttion: 游鹄系统全局分片工具类（一步到位,所有模块复用）
- * @version: v1
- * @Author: youhujun youhu8888@163.com
- * @Date: 2026-01-23 12:51:24
- * @LastEditors: youhujun youhu8888@163.com
- * @LastEditTime: 2026-01-23 12:51:24
- * @FilePath: App\Services\V1\Utils\Shard\ShardFacadeService.php
- * Copyright (C) 2026 youhujun. All rights reserved.
- */
-
 namespace YouHuJun\Tool\App\Services\V1\Utils\Shard;
+
+use YouHuJun\Tool\App\Exceptions\CommonException;
 
 class ShardFacadeService
 {
     /**
-     * 分片配置
+     * 多配置池（唯一配置存储）
      */
-    private array $config = [
-        'db_count' => 1,
-        'table_count' => 1,
-        'db_prefix' => 'ds_',
-        'default_db' => 'ds_0',
-    ];
+    private static array $multiConfigPool = [];
 
     /**
-     * 构造函数
-     *
-     * @param array|null $config 分片配置
+     * 设置指定标识的分片配置
+     * @param string $configKey 配置标识（如youhujun/shard_map）
+     * @param array $config 分片配置
      */
-    public function __construct(?array $config = null)
+    public static function setMultiConfig(string $configKey, array $config): void
     {
-        if ($config !== null) {
-            $this->config = array_merge($this->config, $config);
-        }
+        self::$multiConfigPool[$configKey] = array_merge([
+            'db_count' => 1,
+            'table_count' => 1,
+            'db_prefix' => 'ds_',
+            'default_db' => 'ds_0',
+        ], $config);
     }
 
     /**
-     * 设置分片配置
-     *
-     * @param array $config 配置数组
-     * @return void
-     */
-    public function setConfig(array $config): void
-    {
-        $this->config = array_merge($this->config, $config);
-    }
-
-    /**
-     * 获取配置值
-     *
-     * @param string $key 配置键
+     * 获取指定标识的配置值
+     * @param string $configKey 配置标识
+     * @param string $key 配置项
      * @param mixed $default 默认值
-     * @return mixed
      */
-    public function getConfig(string $key, mixed $default = null): mixed
+    public static function getMultiConfig(string $configKey, string $key, mixed $default = null): mixed
     {
-        return $this->config[$key] ?? $default;
+        // 开发阶段：配置不存在直接报错，强制暴露问题
+        if (!isset(self::$multiConfigPool[$configKey])) {
+            throw new CommonException('ShardKeyEmptyError');
+        }
+        return self::$multiConfigPool[$configKey][$key] ?? $default;
     }
 
     /**
-     * 全局统一:计算分片信息
-     *
-     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID,所有模块的核心分片依据)
-     * @return array [db_name, table_no, shard_key]
+     * 计算分片信息（必须传configKey，无默认值！）
+     * @param string|int $uid 业务ID
+     * @param string $configKey 配置标识（强制传！）
      */
-    public function calc(string|int $uid): array
+    public function calc(string|int $uid, string $configKey): array
     {
-        // 1. 读取分片配置
-        $dbCount = $this->config['db_count'];
-        $tableCount = $this->config['table_count'];
-        $dbPrefix = $this->config['db_prefix'];
-        $defaultDb = $this->config['default_db'];
+        $config = self::$multiConfigPool[$configKey] ?? [];
+        if (empty($config)) {
+            throw new CommonException('ShardKeyEmptyError');
+        }
 
-        // 2. 统一转成数值计算
         $uidValue = (int)$uid;
+        $dbCount = $config['db_count'];
+        $tableCount = $config['table_count'];
+        $dbPrefix = $config['db_prefix'];
 
-        // 3. 计算分片库/表/分片键(全局唯一规则)
         $dbNo = $uidValue % $dbCount;
         $tableNo = $uidValue % $tableCount;
-        $shardKey = $tableNo; // shard_key = uid % table_count
-
-        // 4. 拼接库名
-        $dbName = $dbPrefix . $dbNo;
+        $shardKey = $tableNo;
 
         return [
-            'db' => $dbName,
+            'db' => $dbPrefix . $dbNo,
             'table_no' => $tableNo,
             'shard_key' => $shardKey
         ];
     }
 
     /**
-     * 获取分片表名
-     *
-     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
-     * @param string $baseTable 基础表名(如users/order/feed/shop)
-     * @return string 完整表名
+     * 所有方法都强制传configKey，无默认值！
      */
-    public function getTableName(string|int $uid, string $baseTable): string
+    public function getTableName(string|int $uid, string $baseTable, string $configKey): string
     {
-        $calc = $this->calc($uid);
+        $calc = $this->calc($uid, $configKey);
         return $baseTable . '_' . $calc['table_no'];
     }
 
-    /**
-     * 获取分片数据库连接名
-     *
-     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
-     * @return string 数据库名
-     */
-    public function getDbName(string|int $uid): string
+    public function getDbName(string|int $uid, string $configKey): string
     {
-        $calc = $this->calc($uid);
+        $calc = $this->calc($uid, $configKey);
         return $calc['db'];
     }
 
-    /**
-     * 获取分片键值
-     *
-     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
-     * @return int 分片键
-     */
-    public function getShardKey(string|int $uid): int
+    public function getShardKey(string|int $uid, string $configKey): int
     {
-        $calc = $this->calc($uid);
+        $calc = $this->calc($uid, $configKey);
         return $calc['shard_key'];
     }
+
 }

@@ -1,14 +1,4 @@
 <?php
-/*
- * @Descripttion: 游鹄系统全局分片门面类
- * @version: v1
- * @Author: youhujun youhu8888@163.com
- * @Date: 2026-01-23 12:51:24
- * @LastEditors: youhujun youhu8888@163.com
- * @LastEditTime: 2026-01-23 12:51:24
- * @FilePath: \src\App\Facades\V1\Utils\Shard\ShardFacade.php
- * Copyright (C) 2026 youhujun. All rights reserved.
- */
 namespace YouHuJun\Tool\App\Facades\V1\Utils\Shard;
 
 use YouHuJun\Tool\App\Services\V1\Utils\Shard\ShardFacadeService;
@@ -16,121 +6,62 @@ use BadMethodCallException;
 
 class ShardFacade
 {
-    protected static $instance;
+    /**
+     * 多实例池
+     */
+    protected static array $instancePool = [];
 
     private function __construct() {}
     private function __clone() {}
 
-    public static function setInstance(ShardFacadeService $instance): void
-    {
-        static::$instance = $instance;
-    }
-
-    public static function clearInstance(): void
-    {
-        static::$instance = null;
-    }
-
     /**
-     * 设置分片配置
-     *
-     * @param array $config 配置数组
-     * @return void
+     * 获取指定标识的服务实例
+     * @param string $configKey 配置标识
      */
-    public static function setConfig(array $config): void
+    public static function getInstance(string $configKey): ShardFacadeService
     {
-        self::getInstance()->setConfig($config);
-    }
-
-    /**
-     * 获取配置值
-     *
-     * @param string $key 配置键
-     * @param mixed $default 默认值
-     * @return mixed
-     */
-    public static function getConfig(string $key, mixed $default = null): mixed
-    {
-        return self::getInstance()->getConfig($key, $default);
-    }
-
-    /**
-     * 全局统一:计算分片信息
-     *
-     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID,所有模块的核心分片依据)
-     * @return array [db_name, table_no, shard_key]
-     *
-     * 示例:
-     * $info = ShardFacade::calc(123456);
-     * // 返回: ['db' => 'ds_0', 'table_no' => 0, 'shard_key' => 0]
-     */
-    public static function calc(string|int $uid): array
-    {
-        return self::getInstance()->calc($uid);
-    }
-
-    /**
-     * 获取分片表名
-     *
-     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
-     * @param string $baseTable 基础表名(如users/order/feed/shop)
-     * @return string 完整表名
-     *
-     * 示例:
-     * $tableName = ShardFacade::getTableName(123456, 'users');
-     * // 返回: 'users_0'
-     */
-    public static function getTableName(string|int $uid, string $baseTable): string
-    {
-        return self::getInstance()->getTableName($uid, $baseTable);
-    }
-
-    /**
-     * 获取分片数据库连接名
-     *
-     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
-     * @return string 数据库名
-     *
-     * 示例:
-     * $dbName = ShardFacade::getDbName(123456);
-     * // 返回: 'ds_0'
-     */
-    public static function getDbName(string|int $uid): string
-    {
-        return self::getInstance()->getDbName($uid);
-    }
-
-    /**
-     * 获取分片键值
-     *
-     * @param string|int $uid 业务ID(用户UID/店铺UID等业务实体ID)
-     * @return int 分片键
-     *
-     * 示例:
-     * $shardKey = ShardFacade::getShardKey(123456);
-     * // 返回: 0
-     */
-    public static function getShardKey(string|int $uid): int
-    {
-        return self::getInstance()->getShardKey($uid);
-    }
-
-    protected static function getInstance(): ShardFacadeService
-    {
-        if (static::$instance === null) {
-            static::$instance = new ShardFacadeService();
+        if (!isset(self::$instancePool[$configKey])) {
+            self::$instancePool[$configKey] = new ShardFacadeService();
         }
-        return static::$instance;
+        return self::$instancePool[$configKey];
     }
 
-    public static function __callStatic(string $method, array $parameters)
+    /**
+     * 所有静态方法强制传configKey，无默认值！
+     */
+    public static function calc(string|int $uid, string $configKey): array
     {
-        $instance = static::getInstance();
-        if (!method_exists($instance, $method)) {
-            throw new BadMethodCallException(
-                sprintf('Call to undefined method %s::%s()', get_class($instance), $method)
-            );
-        }
-        return $instance->$method(...$parameters);
+        return self::getInstance($configKey)->calc($uid, $configKey);
+    }
+
+    public static function getTableName(string|int $uid, string $baseTable, string $configKey): string
+    {
+        return self::getInstance($configKey)->getTableName($uid, $baseTable, $configKey);
+    }
+
+    public static function getDbName(string|int $uid, string $configKey): string
+    {
+        return self::getInstance($configKey)->getDbName($uid, $configKey);
+    }
+
+    public static function getShardKey(string|int $uid, string $configKey): int
+    {
+        return self::getInstance($configKey)->getShardKey($uid, $configKey);
+    }
+
+    /**
+     * 批量设置多配置
+     */
+    public static function setMultiConfig(string $configKey, array $config): void
+    {
+        ShardFacadeService::setMultiConfig($configKey, $config);
+    }
+
+    /**
+     * 获取指定标识的配置值
+     */
+    public static function getMultiConfig(string $configKey, string $key, mixed $default = null): mixed
+    {
+        return ShardFacadeService::getMultiConfig($configKey, $key, $default);
     }
 }
