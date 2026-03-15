@@ -7,6 +7,34 @@
 
 ---
 
+## [1.1.6] - 2026-03-16
+
+### 新增
+
+#### 功能模块
+- **Elasticsearch 服务**: 提供完整的 ES 操作支持，包括索引管理、文档 CRUD、搜索查询等功能
+- **ES 认证支持**: 支持 ES 账户密码认证，增强生产环境安全性
+- **数据同步钩子**: 支持通过闭包或接口实现数据同步
+
+#### 新增服务类
+- `YouHuJun\Tool\App\Facades\V1\Es\EsFacade` - ES 门面代理
+- `YouHuJun\Tool\App\Services\V1\Es\EsFacadeService` - ES 服务实现
+- `YouHuJun\Tool\App\Services\V1\Es\Contracts\EsDataSyncContract` - 数据同步接口
+
+#### 文档
+- 新增 `Doucments/Es/UseEsFacade.md` - ES 服务使用文档
+
+### 优化
+- 为所有 Facade 类添加 `__callStatic` 魔术方法，完善门面静态代理功能
+- 统一 Facade 类结构，明确方法声明保持 IDE 代码提示
+- 优化 EsFacade 文档结构，按照"索引管理 → 文档操作 → 高级功能"的逻辑顺序组织
+
+### 修复
+- 修复部分 Facade 类缺少 `__callStatic` 魔术方法的问题
+- 修复 Facade 静态调用无代码提示的问题
+
+---
+
 ## [1.1.4] - 2026-02-17
 
 ### 新增
