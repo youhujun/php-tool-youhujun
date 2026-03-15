@@ -13,6 +13,7 @@
 namespace YouHuJun\Tool\App\Facades\V1\DouYin\Login;
 
 use YouHuJun\Tool\App\Services\V1\DouYin\Login\DouYinLoginFacadeService;
+use BadMethodCallException;
 
 /**
  * 抖音登录服务静态门面类
@@ -66,5 +67,24 @@ class DouYinLoginFacade
     public static function getOpenIdByCodeWithMiniProgram(array $params, array $config): array
     {
         return self::getInstance()->getOpenIdByCodeWithMiniProgram($params, $config);
+    }
+
+    /**
+     * 动态调用未在Facade中显式声明的方法
+     *
+     * @param string $method 方法名
+     * @param array $parameters 参数数组
+     * @return mixed
+     * @throws BadMethodCallException
+     */
+    public static function __callStatic(string $method, array $parameters)
+    {
+        $instance = static::getInstance();
+        if (!method_exists($instance, $method)) {
+            throw new BadMethodCallException(
+                sprintf('Call to undefined method %s::%s()', get_class($instance), $method)
+            );
+        }
+        return $instance->$method(...$parameters);
     }
 }

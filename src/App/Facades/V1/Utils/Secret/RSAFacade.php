@@ -13,6 +13,7 @@
 namespace YouHuJun\Tool\App\Facades\V1\Utils\Secret;
 
 use YouHuJun\Tool\App\Services\V1\Utils\Secret\RSAFacadeService;
+use BadMethodCallException;
 
 /**
  * RSA加解密服务静态门面类
@@ -71,5 +72,24 @@ class RSAFacade
     public static function decrypt(string $data, string $privateKeyString, string $format = 'base64', ?string $passphrase = null, int $padding = OPENSSL_PKCS1_PADDING): string
     {
         return self::getInstance()->decrypt($data, $privateKeyString, $format, $passphrase, $padding);
+    }
+
+    /**
+     * 动态调用未在Facade中显式声明的方法
+     *
+     * @param string $method 方法名
+     * @param array $parameters 参数数组
+     * @return mixed
+     * @throws BadMethodCallException
+     */
+    public static function __callStatic(string $method, array $parameters)
+    {
+        $instance = static::getInstance();
+        if (!method_exists($instance, $method)) {
+            throw new BadMethodCallException(
+                sprintf('Call to undefined method %s::%s()', get_class($instance), $method)
+            );
+        }
+        return $instance->$method(...$parameters);
     }
 }

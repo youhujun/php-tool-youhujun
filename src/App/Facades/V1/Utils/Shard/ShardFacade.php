@@ -64,4 +64,30 @@ class ShardFacade
     {
         return ShardFacadeService::getMultiConfig($configKey, $key, $default);
     }
+
+    /**
+     * 动态调用未在Facade中显式声明的方法
+     *
+     * @param string $method 方法名
+     * @param array $parameters 参数数组
+     * @return mixed
+     * @throws BadMethodCallException
+     */
+    public static function __callStatic(string $method, array $parameters)
+    {
+        // ShardFacade比较特殊,第一个参数必须是configKey
+        $configKey = $parameters[0] ?? null;
+        if (!$configKey) {
+            throw new BadMethodCallException(
+                'ShardFacade requires configKey as the first parameter'
+            );
+        }
+        $instance = static::getInstance($configKey);
+        if (!method_exists($instance, $method)) {
+            throw new BadMethodCallException(
+                sprintf('Call to undefined method %s::%s()', get_class($instance), $method)
+            );
+        }
+        return $instance->$method(...$parameters);
+    }
 }

@@ -13,6 +13,7 @@
 namespace YouHuJun\Tool\App\Facades\V1\Utils\Secret;
 
 use YouHuJun\Tool\App\Services\V1\Utils\Secret\AESFacadeService;
+use BadMethodCallException;
 
 /**
  * AES加解密服务静态门面类
@@ -70,5 +71,24 @@ class AESFacade
     public static function decrypt(string $data, string $key, ?string $method = null, ?string $iv = null): string
     {
         return self::getInstance()->decrypt($data, $key, $method, $iv);
+    }
+
+    /**
+     * 动态调用未在Facade中显式声明的方法
+     *
+     * @param string $method 方法名
+     * @param array $parameters 参数数组
+     * @return mixed
+     * @throws BadMethodCallException
+     */
+    public static function __callStatic(string $method, array $parameters)
+    {
+        $instance = static::getInstance();
+        if (!method_exists($instance, $method)) {
+            throw new BadMethodCallException(
+                sprintf('Call to undefined method %s::%s()', get_class($instance), $method)
+            );
+        }
+        return $instance->$method(...$parameters);
     }
 }
