@@ -35,7 +35,7 @@ class CommonException extends \Exception
      * 配置文件路径
      * @var string
      */
-    protected static $configFile = __DIR__ . '/../../config/error-codes.php';
+    protected static $configFile = __DIR__ . '/../../config/error_codes.php';
 
     /**
      * 是否已加载配置文件
@@ -175,7 +175,7 @@ class CommonException extends \Exception
         ];
 
         // 对字符串进行UTF-8编码检查和转换
-        array_walk_recursive($response, function(&$value) {
+        array_walk_recursive($response, function (&$value) {
             if (is_string($value)) {
                 // 确保字符串是UTF-8编码
                 if (!mb_check_encoding($value, 'UTF-8')) {

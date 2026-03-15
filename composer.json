@@ -32,8 +32,8 @@
     },
     "autoload": {
 		"files": [
-			"src/config/tool-helper.php",
-			"src/config/curl-helper.php"
+			"src/config/tool_helper.php",
+			"src/config/curl_helper.php"
 		],
         "psr-4": {
             "YouHuJun\\Tool\\": "src/"

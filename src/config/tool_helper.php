@@ -1,10 +1,11 @@
 <?php
+
 /*
  * @Descripttion: 自定义助手函数
  * @Author: YouHuJun
  * @Date: 2020-02-20 11:25:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-03-15 14:30:05
+ * @LastEditTime: 2026-03-15 14:51:34
  */
 
 // 格式化打印函数
@@ -37,7 +38,7 @@ if (!function_exists('f')) {
         // 数组递归处理（修复：原代码未赋值回数组）
         if (is_array($param)) {
             foreach ($param as $key => $value) {
-                $param[$key] = f($value, $type); 
+                $param[$key] = f($value, $type);
             }
             return $param;
         }
@@ -46,8 +47,8 @@ if (!function_exists('f')) {
         if ($type === 1) {
             return strip_tags((string)$param);
         }
-        
-        return htmlspecialchars((string)$param, ENT_QUOTES, 'UTF-8'); 
+
+        return htmlspecialchars((string)$param, ENT_QUOTES, 'UTF-8');
     }
 }
 
@@ -65,7 +66,7 @@ if (!function_exists('code')) {
         // 简化逻辑（原逻辑冗余）
         $code = $code ?? [];
         $add = $add ?? [];
-        
+
         return array_merge($code, $add);
     }
 }
@@ -86,7 +87,7 @@ if (!function_exists('is_serialized')) {
         }
 
         $data = trim($data);
-        
+
         // 空序列化
         if ($data === 'N;') {
             return true;
@@ -145,7 +146,7 @@ if (!function_exists('total')) {
         if (is_array($arr)) {
             $level++;
             $levels[] = $level;
-            
+
             foreach ($arr as $v) {
                 total($v, $levels, $level);
             }
