@@ -2,7 +2,7 @@
 
 ## 概述
 
-Elasticsearch服务提供了对 Elasticsearch 的完整操作支持，包括索引管理、文档CRUD、搜索查询以及数据同步等功能。
+Elasticsearch服务提供了对 Elasticsearch 的完整操作支持，包括索引管理、文档CRUD、搜索查询以及批量操作等功能。
 
 ## 安装
 
@@ -42,10 +42,24 @@ EsFacade::init(
 ```php
 // 使用环境变量配置 (推荐)
 EsFacade::init(
-    env('ES_HOST', 'http://127.0.0.1:9200'),
-    env('ES_USER'),
-    env('ES_PASSWORD')
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
 );
+```
+
+## 返回值格式
+
+所有方法统一返回格式：
+
+```php
+[
+    'code' => 0,           // 0=成功, 10000=失败
+    'msg' => '操作成功',   // 提示信息
+    'status' => 1,         // 1=成功, 0=失败, 其他值见各方法说明
+    'error' => null,       // ES原始响应(调试用)
+    'data' => []           // 返回的数据(部分方法有此字段)
+]
 ```
 
 ## 功能方法
@@ -79,7 +93,16 @@ EsFacade::indexExists(string $index): bool
 ```php
 use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
 
-if (EsFacade::indexExists('users')) {
+// 初始化ES
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
+
+$indexName = config('common_es.indices.users');
+
+if (EsFacade::indexExists($indexName)) {
     echo "索引存在";
 } else {
     echo "索引不存在";
@@ -90,12 +113,12 @@ if (EsFacade::indexExists('users')) {
 
 #### 2. 创建索引 - `createIndex`
 
-创建新索引，可选择是否定义字段映射。
+创建新索引，支持设置分片数、副本数和字段映射。
 
 ##### 方法签名
 
 ```php
-EsFacade::createIndex(string $index, array $mapping = []): array
+EsFacade::createIndex(string $index, array $body = []): array
 ```
 
 ##### 参数说明
@@ -103,52 +126,91 @@ EsFacade::createIndex(string $index, array $mapping = []): array
 | 参数名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
 | index | string | 是 | 索引名 |
-| mapping | array | 否 | 索引映射配置(字段定义) |
+| body | array | 否 | 索引配置(settings和mappings) |
 
 ##### 返回值
 
-返回 ES 响应结果数组。
+```php
+[
+    'code' => 0,
+    'msg' => 'es索引创建成功',
+    'status' => 1,
+    'error' => [...]
+]
+```
 
 ##### 使用示例
 
 ```php
 use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
 
-try {
-    // 创建空索引(使用ES默认映射)
-    EsFacade::createIndex('users');
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
 
-    // 创建带字段映射的索引
-    EsFacade::createIndex('users', [
-        'properties' => [
-            'name' => [
-                'type' => 'text',
-                'analyzer' => 'ik_max_word'
-            ],
-            'age' => ['type' => 'integer'],
-            'email' => ['type' => 'keyword'],
-            'status' => ['type' => 'keyword'],
-            'created_at' => ['type' => 'date'],
-            'updated_at' => ['type' => 'date']
+$indexName = config('common_es.indices.users');
+
+// 创建带完整配置的索引
+$result = EsFacade::createIndex($indexName, [
+    'settings' => [
+        // 单节点测试设1，生产可按数据量调
+        'number_of_shards' => config('common_es.setting.shard_number'),
+        // 测试环境不用副本，生产建议设1
+        'number_of_replicas' => config('common_es.setting.replicas_number'),
+        'analysis' => [
+            'analyzer' => [
+                // 全局默认细粒度分词
+                'default' => ['type' => 'ik_max_word'],
+                // 搜索时粗粒度分词
+                'default_search' => ['type' => 'ik_smart']
+            ]
         ]
-    ]);
-    echo "索引创建成功";
+    ],
+    'mappings' => [
+        'properties' => [
+            'phone' => ['type' => 'keyword', 'ignore_above' => 256],
+            'id_number' => ['type' => 'keyword', 'ignore_above' => 256],
+            'account_name' => ['type' => 'keyword', 'ignore_above' => 256],
+            'email' => ['type' => 'keyword', 'ignore_above' => 256],
+            'nick_name' => [
+                'type' => 'text',
+                'fields' => ['keyword' => ['type' => 'keyword', 'ignore_above' => 256]]
+            ],
+            'real_name' => [
+                'type' => 'text',
+                'fields' => ['keyword' => ['type' => 'keyword', 'ignore_above' => 256]]
+            ],
+            'account_status' => ['type' => 'integer'],
+            'real_auth_status' => ['type' => 'integer'],
+            'created_at' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'],
+            'sex' => ['type' => 'integer'],
+            'solar_birthday_at' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis', 'index' => false],
+            'chinese_birthday_at' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis', 'index' => false],
+            'introduction' => ['type' => 'keyword', 'ignore_above' => 512, 'index' => false],
+            'avatar' => ['type' => 'keyword', 'ignore_above' => 512, 'index' => false],
+            'ablum_uid' => ['type' => 'long', 'index' => false],
+            'qrcode' => ['type' => 'keyword', 'ignore_above' => 256, 'index' => false],
+        ]
+    ]
+]);
 
-} catch (\Exception $e) {
-    echo "创建失败: " . $e->getMessage();
+if ($result['code'] === 0) {
+    echo "索引创建成功";
 }
 ```
 
 **常用字段类型说明:**
 
-| ES类型 | 说明 | 示例 |
-|--------|------|------|
-| text | 全文检索字段，会分词 | 文章内容、描述 |
-| keyword | 精确匹配，不分词 | ID、状态码、标签 |
-| integer | 整数 | 年龄、数量 |
-| float | 浮点数 | 价格、分数 |
-| date | 日期时间 | 创建时间 |
-| boolean | 布尔值 | 是否启用 |
+| ES类型 | 说明 | 示例 | 常用配置 |
+|--------|------|------|----------|
+| text | 全文检索字段，会分词 | 文章内容、昵称、真实姓名 | analyzer: ik_max_word |
+| keyword | 精确匹配，不分词 | ID、状态码、手机号、身份证号 | ignore_above: 256 |
+| integer | 整数 | 年龄、状态码 | - |
+| long | 长整型 | 用户ID、相册UID | index: false(不需要搜索) |
+| date | 日期时间 | 创建时间、生日 | format: 'yyyy-MM-dd HH:mm:ss' |
+| boolean | 布尔值 | 是否启用 | - |
 
 ---
 
@@ -170,23 +232,108 @@ EsFacade::deleteIndex(string $index): array
 
 ##### 返回值
 
-返回 ES 响应结果数组。
+```php
+[
+    'code' => 0,
+    'msg' => 'es索引删除成功',
+    'status' => 1,
+    'error' => [...]
+]
+```
 
 ##### 使用示例
 
 ```php
 use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
 
-try {
-    $result = EsFacade::deleteIndex('users');
-    echo "索引删除成功";
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
 
-} catch (\Exception $e) {
-    echo "删除失败: " . $e->getMessage();
+$indexName = config('common_es.indices.users');
+
+$result = EsFacade::deleteIndex($indexName);
+
+if ($result['code'] === 0) {
+    echo "索引删除成功";
 }
 ```
 
 **⚠️ 警告:** 删除索引会永久删除所有数据，请谨慎操作！
+
+---
+
+#### 4. 更新索引映射 - `updateMapping`
+
+更新 ES 索引映射（新增字段，不删数据、不影响原有字段）。相当于 MySQL 的 `ALTER TABLE ADD COLUMN`。
+
+##### 方法签名
+
+```php
+EsFacade::updateMapping(string $index, array $newFields): array
+```
+
+##### 参数说明
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| index | string | 是 | 索引名称 |
+| newFields | array | 是 | 新增字段的映射配置，格式：`['字段名' => ['type' => '字段类型']]` |
+
+##### 返回值
+
+```php
+[
+    'code' => 0,
+    'msg' => 'es索引更新成功',
+    'status' => 1,
+    'error' => [...]
+]
+```
+
+##### 使用示例
+
+```php
+use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
+
+// 测试增加索引字段
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
+
+$indexName = config('common_es.indices.users');
+
+// 新增单个字段
+$newFields = [
+    'user_uid' => ['type' => 'keyword']
+];
+
+$result = EsFacade::updateMapping($indexName, $newFields);
+
+if ($result['code'] === 0) {
+    echo $result['msg'];
+}
+
+// 批量新增多个字段
+$newFields = [
+    'user_uid' => ['type' => 'keyword', 'ignore_above' => 256],
+    'total_score' => ['type' => 'integer'],
+    'last_login_at' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis']
+];
+
+$result = EsFacade::updateMapping($indexName, $newFields);
+```
+
+**⚠️ 注意事项:**
+
+- 只能新增字段，不能修改或删除已有字段的映射
+- ES 中已存在的字段类型一旦确定就不能修改（需要重建索引）
+- 建议在索引创建前规划好字段映射，尽量减少后续修改
+- 新增字段会自动应用默认设置（如 analyzer、ignore_above 等）
 
 ---
 
@@ -214,45 +361,74 @@ EsFacade::createDoc(string $index, array $data, string $docId = null): array
 
 ##### 返回值
 
-返回 ES 响应结果数组。
+```php
+[
+    'code' => 0,
+    'msg' => 'es文档创建成功',  // 或 'es文档更新成功'
+    'status' => 1,               // 1=创建成功, 2=更新成功
+    'error' => [...]
+]
+```
 
 ##### 使用示例
 
 ```php
 use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
 
-try {
-    // 自动生成ID创建
-    $docId = EsFacade::createDoc('users', [
-        'name' => '游鹄君',
-        'age' => 25,
-        'email' => 'youhu8888@163.com'
-    ]);
-    echo "文档ID: " . json_encode($docId);
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
 
-    // 指定ID创建
-    $result = EsFacade::createDoc('users', [
-        'name' => '雪儿',
-        'age' => 18,
-        'email' => 'xueer@youhujun.com'
-    ], 'user_001');
-    echo "创建结果: " . json_encode($result);
+$indexName = config('common_es.indices.users');
 
-} catch (\Exception $e) {
-    echo "创建失败: " . $e->getMessage();
+// 查询用户数据
+$userObject = ShardHelperFacade::queryAllShards(
+    User::class,
+    function ($query) {
+        $query->where('account_status', 1)->where('account_name', 'develop');
+    },
+    'account_name',
+    ['develop']
+)->first();
+
+$userInfoObject = ShardHelperFacade::queryByShardWithCache(UserInfo::class, $userObject->biz_id)->first();
+
+// 构造ES文档数据
+$data = [
+    'phone' => $userObject->phone,
+    'account_name' => $userObject->account_name,
+    'email' => $userObject->email,
+    'account_status' => $userObject->account_status,
+    'real_auth_status' => $userObject->real_auth_status,
+    'created_at' => $userObject->created_at,
+    'id_number' => $userInfoObject->id_number,
+    'nick_name' => $userInfoObject->nick_name,
+    'real_name' => $userInfoObject->real_name,
+    'sex' => $userInfoObject->sex,
+    'solar_birthday_at' => $userInfoObject->solar_birthday_at,
+    'chinese_birthday_at' => $userInfoObject->chinese_birthday_at,
+];
+
+// 指定ID创建文档
+$result = EsFacade::createDoc($indexName, $data, $userObject->biz_id);
+
+if ($result['code'] === 0) {
+    echo $result['msg']; // es文档创建成功 或 es文档更新成功
 }
 ```
 
 ---
 
-#### 2. 获取文档 - `getDoc`
+#### 2. 获取单个文档 - `findDoc`
 
 根据文档ID获取单个文档。
 
 ##### 方法签名
 
 ```php
-EsFacade::getDoc(string $index, string $docId): array
+EsFacade::findDoc(string $index, string $docId): array
 ```
 
 ##### 参数说明
@@ -264,19 +440,43 @@ EsFacade::getDoc(string $index, string $docId): array
 
 ##### 返回值
 
-返回文档数据数组。
+```php
+[
+    'code' => 0,
+    'msg' => 'es文档查找成功',
+    'status' => 1,
+    'data' => [...],   // 文档数据(_source)
+    'error' => [...]
+]
+```
 
 ##### 使用示例
 
 ```php
 use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
 
-try {
-    $doc = EsFacade::getDoc('users', 'user_001');
-    echo "文档数据: " . json_encode($doc, JSON_UNESCAPED_UNICODE);
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
 
-} catch (\Exception $e) {
-    echo "获取失败: " . $e->getMessage();
+$indexName = config('common_es.indices.users');
+
+$userObject = ShardHelperFacade::queryAllShards(
+    User::class,
+    function ($query) {
+        $query->where('account_status', 1)->where('account_name', 'develop');
+    },
+    'account_name',
+    ['develop']
+)->first();
+
+$result = EsFacade::findDoc($indexName, $userObject->biz_id);
+
+if ($result['code'] === 0) {
+    echo "文档数据: ";
+    print_r($result['data']);
 }
 ```
 
@@ -303,38 +503,65 @@ EsFacade::updateDoc(string $index, string $docId, array $data, bool $isPartial =
 
 ##### 返回值
 
-返回 ES 响应结果数组。
+```php
+[
+    'code' => 0,
+    'msg' => 'es文档更新成功',  // 或 'es文档创建成功'/'es文档无更新（数据未变化）'
+    'status' => 1,               // 1=创建成功, 2=更新成功, 3=无操作
+    'error' => [...]
+]
+```
 
 ##### 使用示例
 
 ```php
 use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
 
-try {
-    // 局部更新(推荐)
-    $result = EsFacade::updateDoc('users', 'user_001', [
-        'age' => 26,
-        'email' => 'newemail@example.com'
-    ], true);
-    echo "局部更新成功";
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
 
-    // 全量替换
-    $result = EsFacade::updateDoc('users', 'user_001', [
-        'name' => '游鹄君',
-        'age' => 26,
-        'email' => 'newemail@example.com',
-        'status' => 'active'
-    ], false);
-    echo "全量替换成功";
+$indexName = config('common_es.indices.users');
 
-} catch (\Exception $e) {
-    echo "更新失败: " . $e->getMessage();
+$userObject = ShardHelperFacade::queryAllShards(
+    User::class,
+    function ($query) {
+        $query->where('account_status', 1)->where('account_name', 'super');
+    },
+    'account_name',
+    ['super']
+)->first();
+
+$userInfoObject = ShardHelperFacade::queryByShardWithCache(UserInfo::class, $userObject->biz_id)->first();
+
+$data = [
+    'phone' => '15688523141',
+    'account_name' => $userObject->account_name,
+    'email' => $userObject->email,
+    'account_status' => $userObject->account_status,
+    'real_auth_status' => $userObject->real_auth_status,
+    'created_at' => $userObject->created_at,
+    'id_number' => $userInfoObject->id_number,
+    'nick_name' => $userInfoObject->nick_name,
+    'real_name' => $userInfoObject->real_name,
+    'sex' => $userInfoObject->sex,
+    'solar_birthday_at' => $userInfoObject->solar_birthday_at,
+    'chinese_birthday_at' => $userInfoObject->chinese_birthday_at,
+];
+
+// 局部更新(推荐)
+$result = EsFacade::updateDoc($indexName, $userObject->biz_id, $data);
+
+if ($result['code'] === 0) {
+    echo $result['msg'];
 }
 ```
 
 ---
 
-#### 4. 删除文档 - `deleteDoc`
+#### 4. 删除单个文档 - `deleteDoc`
 
 删除单个文档。
 
@@ -353,19 +580,41 @@ EsFacade::deleteDoc(string $index, string $docId): array
 
 ##### 返回值
 
-返回 ES 响应结果数组。
+```php
+[
+    'code' => 0,
+    'msg' => 'es文档无删除成功',  // 或 'es文档不存在'
+    'status' => 1,               // 1=删除成功, 4=文档不存在
+    'error' => [...]
+]
+```
 
 ##### 使用示例
 
 ```php
 use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
 
-try {
-    $result = EsFacade::deleteDoc('users', 'user_001');
-    echo "删除成功";
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
 
-} catch (\Exception $e) {
-    echo "删除失败: " . $e->getMessage();
+$indexName = config('common_es.indices.users');
+
+$userObject = ShardHelperFacade::queryAllShards(
+    User::class,
+    function ($query) {
+        $query->where('account_status', 1)->where('account_name', 'develop');
+    },
+    'account_name',
+    ['develop']
+)->first();
+
+$result = EsFacade::deleteDoc($indexName, $userObject->biz_id);
+
+if ($result['code'] === 0) {
+    echo $result['msg'];
 }
 ```
 
@@ -392,32 +641,51 @@ EsFacade::searchDoc(string $index, array $query, int $from = 0, int $size = 10):
 
 ##### 返回值
 
-返回搜索结果数组。
+```php
+[
+    'code' => 0,
+    'msg' => 'es文档批量查询',
+    'status' => 1,
+    'data' => [               // ES原始搜索结果
+        'hits' => [
+            'total' => [...],
+            'hits' => [...]
+        ]
+    ],
+    'error' => [...]
+]
+```
 
 ##### 使用示例
 
 ```php
 use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
 
-try {
-    // 精确匹配搜索
-    $result = EsFacade::searchDoc('users', [
-        'match' => ['name' => '游鹄君']
-    ]);
-    echo "搜索结果: " . json_encode($result, JSON_UNESCAPED_UNICODE);
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
 
-    // 分页搜索
-    $result = EsFacade::searchDoc('users', [
-        'match_all' => (object)[]
-    ], 10, 20); // 从第10条开始，返回20条
+$indexName = config('common_es.indices.users');
 
-    // 多索引搜索
-    $result = EsFacade::searchDoc('users,orders', [
-        'match' => ['name' => '游鹄君']
-    ]);
+// 精确匹配搜索
+$query = [
+    'match' => ['account_name' => 'develop']
+];
 
-} catch (\Exception $e) {
-    echo "搜索失败: " . $e->getMessage();
+$result = EsFacade::searchDoc($indexName, $query);
+
+if ($result['code'] === 0) {
+    $hits = $result['data']['hits']['hits'];
+    $total = $result['data']['hits']['total']['value'];
+    
+    echo "总共找到 {$total} 条记录\n";
+    foreach ($hits as $hit) {
+        echo "文档ID: {$hit['_id']}\n";
+        echo "数据: ";
+        print_r($hit['_source']);
+    }
 }
 ```
 
@@ -442,27 +710,193 @@ EsFacade::deleteByQuery(string $index, array $query): array
 
 ##### 返回值
 
-返回 ES 响应结果数组。
+```php
+[
+    'code' => 0,
+    'msg' => 'es文档批量删除成功',
+    'status' => 1,
+    'error' => [...]
+]
+```
 
 ##### 使用示例
 
 ```php
 use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
 
-try {
-    $result = EsFacade::deleteByQuery('users', [
-        'term' => ['status' => 'deleted']
-    ]);
-    echo "删除成功";
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
 
-} catch (\Exception $e) {
-    echo "删除失败: " . $e->getMessage();
+$indexName = config('common_es.indices.users');
+
+$query = [
+    'match' => ['account_name' => 'develop']
+];
+
+$result = EsFacade::deleteByQuery($indexName, $query);
+
+if ($result['code'] === 0) {
+    echo $result['msg'];
 }
 ```
 
 ---
 
-### 三、高级功能
+### 三、批量操作
+
+批量操作可以大幅提升性能，特别适合大量数据的写入和删除场景。
+
+#### 1. 批量写入/更新文档 - `batchActDoc`
+
+批量写入或更新文档（直接调用ES _bulk API）。
+
+##### 方法签名
+
+```php
+EsFacade::batchActDoc(string $index, array $data): array
+```
+
+##### 参数说明
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| index | string | 是 | 索引名 |
+| data | array | 是 | 批量数据，每条必须包含 `_docId` 字段 |
+
+##### 返回值
+
+```php
+[
+    'code' => 0,
+    'msg' => 'es批量写入成功',
+    'status' => 1,
+    'error' => [...]
+]
+```
+
+##### 使用示例
+
+```php
+use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
+
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
+
+$indexName = config('common_es.indices.users');
+
+// 查询用户数据集合
+$userCollection = ShardHelperFacade::queryAllShards(
+    User::class,
+    function ($query) {
+        $query->where('account_status', 1);
+    },
+);
+
+// 构造批量数据
+$data = [];
+foreach ($userCollection as $key => $userObject) {
+    $data[] = [
+        '_docId' => $userObject->biz_id,  // 必须：文档ID
+        'phone' => $userObject->phone,
+        'account_name' => $userObject->account_name,
+        'email' => $userObject->email,
+        'account_status' => $userObject->account_status,
+        'real_auth_status' => $userObject->real_auth_status,
+        'created_at' => $userObject->created_at,
+    ];
+}
+
+// 批量写入ES
+$result = EsFacade::batchActDoc($indexName, $data);
+
+if ($result['code'] === 0) {
+    echo $result['msg'];
+}
+```
+
+---
+
+#### 2. 批量删除文档 - `batchDeleteDoc`
+
+批量删除文档，支持单ID、多ID、条件删除三种模式。
+
+##### 方法签名
+
+```php
+EsFacade::batchDeleteDoc(string $index, string|array $dataOrCondition): array
+```
+
+##### 参数说明
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| index | string | 是 | 索引名 |
+| dataOrCondition | string\|array | 是 | 删除条件：字符串(单ID) / 一维数组(多ID) / 二维数组(查询条件) |
+
+##### 返回值
+
+```php
+[
+    'code' => 0,
+    'msg' => 'es批量删除成功',
+    'status' => 1,
+    'error' => [...]
+]
+```
+
+##### 使用示例
+
+```php
+use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
+
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
+
+$indexName = config('common_es.indices.users');
+
+$userCollection = ShardHelperFacade::queryAllShards(
+    User::class,
+    function ($query) {
+        $query->where('account_status', 1);
+    },
+);
+
+// 1. 单个文档ID删除
+$singleDocId = $userCollection->first()->biz_id;
+$result1 = EsFacade::batchDeleteDoc($indexName, $singleDocId);
+
+// 2. 多个文档ID删除（一维数组）
+$multiDocIds = [
+    $userCollection[1]->biz_id,
+    $userCollection[2]->biz_id
+];
+$result2 = EsFacade::batchDeleteDoc($indexName, $multiDocIds);
+
+// 3. 条件删除（二维数组）
+$deleteQuery = [
+    'match' => [
+        'account_status' => 1
+    ]
+];
+$result3 = EsFacade::batchDeleteDoc($indexName, $deleteQuery);
+
+if ($result1['code'] === 0) {
+    echo $result1['msg'];
+}
+```
+
+---
+
+### 四、高级功能
 
 #### 1. 自定义请求 - `customRequest`
 
@@ -496,261 +930,185 @@ try {
 
 ---
 
-#### 2. 数据同步
+## 完整实战示例
 
-支持通过闭包或接口方式实现数据同步。
-
-##### 方式一: 使用闭包钩子
-
-```php
-use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
-
-// 注册数据同步钩子
-EsFacade::registerSyncHook(function(string $type, string $index, array $data, ?string $docId = null) {
-    // 自定义同步逻辑
-    switch ($type) {
-        case 'single':
-            // 单条同步
-            return EsFacade::createDoc($index, $data, $docId);
-        case 'batch':
-            // 批量同步
-            foreach ($data as $item) {
-                EsFacade::createDoc($index, $item, $item['_id'] ?? null);
-            }
-            return ['success' => true];
-        case 'delete':
-            // 删除同步
-            return EsFacade::deleteDoc($index, $docId);
-    }
-});
-
-// 执行同步
-$result = EsFacade::syncData('single', 'users', [
-    'name' => '游鹄君',
-    'age' => 25
-], 'user_001');
-```
-
-##### 方式二: 使用接口实现
-
-```php
-use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
-use YouHuJun\Tool\App\Services\V1\Es\Contracts\EsDataSyncContract;
-
-class UserEsSync implements EsDataSyncContract
-{
-    public function syncSingle(string $index, array $data, ?string $docId = null): array
-    {
-        // 自定义单条同步逻辑
-        return EsFacade::createDoc($index, $data, $docId);
-    }
-
-    public function syncBatch(string $index, array $data): array
-    {
-        // 自定义批量同步逻辑
-        return EsFacade::customRequest('POST', '/_bulk', $data);
-    }
-
-    public function syncDelete(string $index, string|array $docId): array
-    {
-        // 自定义删除同步逻辑
-        return EsFacade::deleteDoc($index, $docId);
-    }
-}
-
-// 注册接口实现
-$userSync = new UserEsSync();
-EsFacade::registerSyncContract($userSync);
-
-// 执行同步
-$result = EsFacade::syncData('single', 'users', [
-    'name' => '雪儿',
-    'age' => 18
-], 'user_002');
-```
-
----
-
-## 完整示例
-
-### 示例1: 完整的CRUD操作
+### 示例1: 用户索引完整流程
 
 ```php
 <?php
 
 use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
 
-// 初始化
-EsFacade::init('http://127.0.0.1:9200');
+// 1. 初始化ES
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
 
-try {
-    // 1. 创建索引
-    if (!EsFacade::indexExists('products')) {
-        EsFacade::createIndex('products', [
+$indexName = config('common_es.indices.users');
+
+// 2. 检查索引是否存在
+if (!EsFacade::indexExists($indexName)) {
+    echo "索引不存在，准备创建..." . PHP_EOL;
+    
+    // 3. 创建索引
+    $result = EsFacade::createIndex($indexName, [
+        'settings' => [
+            'number_of_shards' => config('common_es.setting.shard_number'),
+            'number_of_replicas' => config('common_es.setting.replicas_number'),
+        ],
+        'mappings' => [
             'properties' => [
-                'name' => ['type' => 'text'],
-                'price' => ['type' => 'float'],
-                'category' => ['type' => 'keyword']
+                'account_name' => ['type' => 'keyword', 'ignore_above' => 256],
+                'email' => ['type' => 'keyword', 'ignore_above' => 256],
+                'account_status' => ['type' => 'integer'],
             ]
-        ]);
+        ]
+    ]);
+    
+    if ($result['code'] === 0) {
         echo "索引创建成功" . PHP_EOL;
     }
-
-    // 2. 创建文档
-    $result = EsFacade::createDoc('products', [
-        'name' => '游鹄生态会员',
-        'price' => 99.99,
-        'category' => 'service'
-    ], 'prod_001');
-    echo "文档创建成功: " . json_encode($result) . PHP_EOL;
-
-    // 3. 获取文档
-    $doc = EsFacade::getDoc('products', 'prod_001');
-    echo "文档数据: " . json_encode($doc, JSON_UNESCAPED_UNICODE) . PHP_EOL;
-
-    // 4. 更新文档
-    $result = EsFacade::updateDoc('products', 'prod_001', [
-        'price' => 88.88
-    ]);
-    echo "文档更新成功" . PHP_EOL;
-
-    // 5. 搜索文档
-    $result = EsFacade::searchDoc('products', [
-        'match' => ['name' => '游鹄']
-    ]);
-    echo "搜索结果: " . json_encode($result, JSON_UNESCAPED_UNICODE) . PHP_EOL;
-
-    // 6. 删除文档
-    $result = EsFacade::deleteDoc('products', 'prod_001');
-    echo "文档删除成功" . PHP_EOL;
-
-} catch (\Exception $e) {
-    echo "操作失败: " . $e->getMessage() . PHP_EOL;
-}
-```
-
-### 示例2: 用户搜索功能
-
-```php
-<?php
-
-use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
-
-/**
- * 搜索用户
- */
-function searchUsers(string $keyword, int $page = 1, int $pageSize = 10): array
-{
-    try {
-        $from = ($page - 1) * $pageSize;
-
-        // 多字段搜索
-        $result = EsFacade::searchDoc('users', [
-            'multi_match' => [
-                'query' => $keyword,
-                'fields' => ['name', 'email', 'nickname']
-            ]
-        ], $from, $pageSize);
-
-        return [
-            'success' => true,
-            'data' => $result['hits']['hits'] ?? [],
-            'total' => $result['hits']['total']['value'] ?? 0
-        ];
-
-    } catch (\Exception $e) {
-        return [
-            'success' => false,
-            'message' => $e->getMessage()
-        ];
-    }
 }
 
-// 使用示例
-$result = searchUsers('游鹄', 1, 10);
-print_r($result);
-```
+// 4. 创建文档
+$userData = [
+    'account_name' => 'test_user',
+    'email' => 'test@example.com',
+    'account_status' => 1,
+];
 
-### 示例3: 数据同步到ES
+$result = EsFacade::createDoc($indexName, $userData, 'user_001');
+echo $result['msg'] . PHP_EOL;
 
-```php
-<?php
+// 5. 搜索文档
+$searchResult = EsFacade::searchDoc($indexName, [
+    'match' => ['account_name' => 'test_user']
+]);
 
-use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
-
-/**
- * 用户模型数据同步到ES
- */
-class UserSyncHandler implements EsDataSyncContract
-{
-    public function syncSingle(string $index, array $data, ?string $docId = null): array
-    {
-        try {
-            return EsFacade::createDoc($index, $data, $docId);
-        } catch (\Exception $e) {
-            throw new CommonException("用户同步失败: " . $e->getMessage());
-        }
-    }
-
-    public function syncBatch(string $index, array $data): array
-    {
-        try {
-            // 批量操作
-            $bulkData = '';
-            foreach ($data as $item) {
-                $id = $item['id'] ?? null;
-                unset($item['id']);
-
-                $bulkData .= json_encode(['index' => ['_index' => $index, '_id' => $id]]) . "\n";
-                $bulkData .= json_encode($item, JSON_UNESCAPED_UNICODE) . "\n";
-            }
-
-            return EsFacade::customRequest('POST', '/_bulk', $bulkData);
-        } catch (\Exception $e) {
-            throw new CommonException("批量同步失败: " . $e->getMessage());
-        }
-    }
-
-    public function syncDelete(string $index, string|array $docId): array
-    {
-        try {
-            return EsFacade::deleteDoc($index, $docId);
-        } catch (\Exception $e) {
-            throw new CommonException("删除同步失败: " . $e->getMessage());
-        }
-    }
+if ($searchResult['code'] === 0) {
+    echo "找到 " . $searchResult['data']['hits']['total']['value'] . " 条记录\n";
 }
 
-// 使用示例
-$userSync = new UserSyncHandler();
-EsFacade::registerSyncContract($userSync);
+// 6. 更新文档
+$updateResult = EsFacade::updateDoc($indexName, 'user_001', [
+    'email' => 'newemail@example.com'
+]);
+echo $updateResult['msg'] . PHP_EOL;
 
-// 同步单个用户
-EsFacade::syncData('single', 'users', [
-    'id' => 'user_001',
-    'name' => '游鹄君',
-    'age' => 25
-], 'user_001');
+// 7. 删除文档
+$deleteResult = EsFacade::deleteDoc($indexName, 'user_001');
+echo $deleteResult['msg'] . PHP_EOL;
 ```
 
 ---
 
-## 错误处理
-
-所有方法在失败时都会抛出异常，建议使用 try-catch 捕获。
-
-### 错误处理示例
+### 示例2: 批量同步用户数据到ES
 
 ```php
-use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
-use YouHuJun\Tool\App\Exceptions\CommonException;
+<?php
 
-try {
-    $result = EsFacade::createDoc('users', $data);
-} catch (CommonException $e) {
-    error_log("ES操作失败: " . $e->getMessage());
-    // 处理错误
+use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
+
+/**
+ * 批量同步用户数据到ES
+ */
+function syncUsersToEs()
+{
+    // 初始化ES
+    EsFacade::init(
+        config('common_es.host'),
+        config('common_es.user'),
+        config('common_es.password')
+    );
+    
+    $indexName = config('common_es.indices.users');
+    
+    // 查询需要同步的用户
+    $userCollection = ShardHelperFacade::queryAllShards(
+        User::class,
+        function ($query) {
+            $query->where('account_status', 1);
+        },
+    );
+    
+    if ($userCollection->isEmpty()) {
+        echo "没有需要同步的用户";
+        return;
+    }
+    
+    // 构造批量数据
+    $data = [];
+    foreach ($userCollection as $userObject) {
+        $data[] = [
+            '_docId' => $userObject->biz_id,
+            'phone' => $userObject->phone,
+            'account_name' => $userObject->account_name,
+            'email' => $userObject->email,
+            'account_status' => $userObject->account_status,
+            'real_auth_status' => $userObject->real_auth_status,
+            'created_at' => $userObject->created_at,
+        ];
+    }
+    
+    // 批量写入ES
+    $result = EsFacade::batchActDoc($indexName, $data);
+    
+    if ($result['code'] === 0) {
+        echo "成功同步 {$userCollection->count()} 个用户到ES";
+    } else {
+        echo "同步失败: " . $result['msg'];
+    }
 }
+
+// 执行同步
+syncUsersToEs();
+```
+
+---
+
+### 示例3: 批量清理无效用户数据
+
+```php
+<?php
+
+use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
+
+/**
+ * 批量清理ES中的无效用户数据
+ */
+function cleanInvalidUsersFromEs()
+{
+    // 初始化ES
+    EsFacade::init(
+        config('common_es.host'),
+        config('common_es.user'),
+        config('common_es.password')
+    );
+    
+    $indexName = config('common_es.indices.users');
+    
+    // 方式1: 按条件批量删除
+    $deleteQuery = [
+        'term' => [
+            'account_status' => 0  // 删除账户状态为0的用户
+        ]
+    ];
+    
+    $result = EsFacade::batchDeleteDoc($indexName, $deleteQuery);
+    
+    if ($result['code'] === 0) {
+        echo "批量清理完成";
+    }
+    
+    // 方式2: 按ID列表批量删除
+    // $invalidUserIds = ['user_001', 'user_002', 'user_003'];
+    // $result = EsFacade::batchDeleteDoc($indexName, $invalidUserIds);
+}
+
+// 执行清理
+cleanInvalidUsersFromEs();
 ```
 
 ---
@@ -761,7 +1119,7 @@ try {
 
 - 默认连接地址: `http://127.0.0.1:9200`
 - 支持账户密码认证
-- 生产环境建议使用环境变量配置ES连接信息
+- 生产环境建议使用配置文件管理ES连接信息
 - 确保ES服务已启动且可访问
 
 ### 2. 认证配置
@@ -786,37 +1144,39 @@ EsFacade::init(
 2. 使用HTTPS协议传输
 3. 密码使用强密码策略
 4. 定期更换账户密码
-5. 使用环境变量存储敏感信息
+5. 使用配置文件存储敏感信息
 
-**环境变量配置示例:**
+**Laravel配置示例:**
 
 ```env
-# .env 文件
+# config/common_es.php
 ES_HOST=http://your-es-server.com:9200
 ES_USER=elastic
 ES_PASSWORD=your-strong-password-here
 ```
 
 ```php
-// Laravel 示例
+// 使用
 EsFacade::init(
-    env('ES_HOST', 'http://127.0.0.1:9200'),
-    env('ES_USER'),
-    env('ES_PASSWORD')
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
 );
 ```
 
 ### 3. 性能优化
 
-- **批量操作**: 使用 `_bulk` API 进行批量操作，性能更好
+- **批量操作**: 使用 `batchActDoc` 和 `batchDeleteDoc` 进行批量操作，性能更好
 - **分页查询**: 合理设置 `from` 和 `size` 参数，避免返回过多数据
-- **索引优化**: 根据业务需求合理设计索引映射
+- **索引优化**: 根据业务需求合理设计索引映射和分片配置
+- **字段配置**: 不需要搜索的字段设置 `'index' => false` 可以节省存储空间
 
 ### 4. 数据一致性
 
 - 更新操作建议使用局部更新(`isPartial = true`)
 - 批量操作注意事务处理
 - 数据同步时建议使用队列异步处理
+- 定期检查ES与主数据库的数据一致性
 
 ### 5. 安全建议
 

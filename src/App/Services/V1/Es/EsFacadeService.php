@@ -1,18 +1,17 @@
 <?php
+
 /*
  * @Descripttion: 自动生成的服务类
  * @version: v1
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-03-15 23:49:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-03-16 03:18:47
- * @FilePath: \php-tool-youhujun\src\App\Services\V1\Es\EsFacadeService.php
+ * @LastEditTime: 2026-03-19 04:37:47
+ * @FilePath: \youhu-laravel-api-12d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\App\Services\V1\Es\EsFacadeService.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
 
 namespace YouHuJun\Tool\App\Services\V1\Es;
-
-use YouHuJun\Tool\App\Services\V1\Es\Contracts\EsDataSyncContract;
 
 use YouHuJun\Tool\App\Exceptions\CommonException;
 
@@ -21,10 +20,10 @@ use YouHuJun\Tool\App\Exceptions\CommonException;
  */
 class EsFacadeService
 {
-	 /**
-     * ES服务地址（如：http://127.0.0.1:9200）
-     * @var string
-     */
+    /**
+    * ES服务地址（如：http://127.0.0.1:9200）
+    * @var string
+    */
     private $esHost;
 
     /**
@@ -33,7 +32,7 @@ class EsFacadeService
      */
     private $headers;
 
-	/**
+    /**
      * ES认证账号
      * @var string|null
      */
@@ -45,7 +44,7 @@ class EsFacadeService
      */
     private ?string $esPass = null;
 
-	/**
+    /**
      * 数据同步钩子（闭包）
      * @var \Closure|null
      */
@@ -61,9 +60,9 @@ class EsFacadeService
      * 构造函数（初始化ES配置）
      * @param string $esHost ES服务地址
      */
-    public function __construct(string $esHost = 'http://127.0.0.1:9200',string $esUser = null, string $esPass = null)
+    public function __construct(string $esHost = 'http://127.0.0.1:9200', string $esUser = null, string $esPass = null)
     {
-		// 去除末尾斜杠，避免URL拼接错误
+        // 去除末尾斜杠，避免URL拼接错误
         $this->esHost = rtrim($esHost, '/');
         // 基础请求头
         $this->headers = [
@@ -81,15 +80,242 @@ class EsFacadeService
     }
 
     /**
-     * 创建/新增文档（PUT/POST）
+     * 检查索引是否存在
      * @param string $index 索引名
-     * @param mixed $data 文档数据（数组）
-     * @param string|null $docId 文档ID（不传则ES自动生成）
-     * @return array 响应结果（解析为数组）
+     * @return bool 存在返回true，否则false
      * @throws \Exception
+     */
+    public function indexExists(string $index): bool
+    {
+        $this->validateIndexName($index);
+
+        $url = "{$this->esHost}/{$index}";
+        $response = httpHead($url, $this->headers);
+
+        //成功
+        //HTTP/1.1 200 OKX-elastic-product: Elasticsearchcontent-type: application/json; charset=UTF-8content-length: 1057
+        //失败
+        //HTTP/1.1 404 Not FoundX-elastic-product: Elasticsearchcontent-type: application/json; charset=UTF-8content-length: 371
+
+        //$code = (int)substr($response, 9, 3);
+
+        if (preg_match('/HTTP\/\d\.\d\s+(\d{3})/', $response, $matches)) {
+            $code = (int)$matches[1];
+        } else {
+            // 响应格式异常时默认返回不存在
+            return false;
+        }
+
+        return $code === 200;
+    }
+
+
+    /**
+     * 创建 Elasticsearch 索引
+     *
+     * 通过 HTTP PUT 请求向 Elasticsearch 服务器发送索引创建请求。
+     * 如果索引已存在，也会返回成功状态。
+     *
+     * @param string $index 索引名称
+     * @param array $body 索引配置和映射信息，默认为空数组
+     * @return array $result 返回数组信息
+     */
+    public function createIndex(string $index, array $body = []): array
+    {
+        $this->validateIndexName($index);
+
+
+        $result = ['code' => 10000,'msg' => 'es索引创建失败','status' => 0,'error' => null];
+
+        $url = "{$this->esHost}/{$index}";
+        $response = httpPut($url, $this->headers, $body);
+        $jsonResultArray = $this->parseResponse($response);
+
+        /**
+         * 成功创建
+         * Array
+            (
+                [acknowledged] => 1
+                [shards_acknowledged] => 1
+                [index] => youhu_users_index
+            )
+         */
+
+        if (isset($jsonResultArray['index']) && $jsonResultArray['index'] == $index) {
+            $result['code'] = 0;
+            $result['msg'] = 'es索引创建成功';
+            $result['status'] = 1;
+        }
+
+        /**
+         * 已经存在索引
+         * Array
+        (
+            [error] => Array
+                (
+                    [root_cause] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [type] => resource_already_exists_exception
+                                    [reason] => index [youhu_users_index/6Yq37NqeRWC9q65xvNaCTA] already exists
+                                    [index_uuid] => 6Yq37NqeRWC9q65xvNaCTA
+                                    [index] => youhu_users_index
+                                )
+
+                        )
+
+                    [type] => resource_already_exists_exception
+                    [reason] => index [youhu_users_index/6Yq37NqeRWC9q65xvNaCTA] already exists
+                    [index_uuid] => 6Yq37NqeRWC9q65xvNaCTA
+                    [index] => youhu_users_index
+                )
+
+            [status] => 400
+        )
+         */
+        if (isset($jsonResultArray['error'])) {
+            if (isset($jsonResultArray['error']['index']) && $jsonResultArray['error']['index'] == $index) {
+                $result['code'] = 0;
+                $result['msg'] = 'es索引创建成功';
+                $result['status'] = 1;
+            }
+        }
+
+        $result['error'] = $jsonResultArray;
+
+        return $result;
+    }
+
+    /**
+     * 更新 ES 索引映射（新增字段，不删数据、不影响原有字段）
+     * 相当于 MySQL 的 ALTER TABLE ADD COLUMN
+     *
+     * @param string $index 索引名称
+     * @param array $newFields 新增字段的映射配置，格式：['字段名' => ['type' => '字段类型']]
+     * @return array $result 返回数组信息
+     */
+    public function updateMapping(string $index, array $newFields): array
+    {
+        $this->validateIndexName($index);
+
+        $result = ['code' => 10000,'msg' => 'es索引映射更新失败','status' => 0,'error' => null];
+
+        // 构造更新映射的请求体（只加新字段，不修改原有字段）
+        $body = [
+            'properties' => $newFields
+        ];
+
+        // ES 更新映射的固定接口：/_mapping
+        $url = "{$this->esHost}/{$index}/_mapping";
+        $response = httpPut($url, $this->headers, $body);
+        $jsonResultArray = $this->parseResponse($response);
+
+        /**
+         * 更新成功的返回格式：
+         * Array
+            (
+                [acknowledged] => 1
+            )
+        */
+        if (isset($jsonResultArray['acknowledged']) && $jsonResultArray['acknowledged'] == 1) {
+            $result['code'] = 0;
+            $result['msg'] = 'es索引映射更新成功';
+            $result['status'] = 1;
+        }
+        // 捕获更新失败的异常信息
+        $result['error'] = $jsonResultArray;
+
+        return $result;
+    }
+
+    /**
+     * 删除索引
+     * @param string $index 索引名
+     * @return array $result 数组信息
+     */
+    public function deleteIndex(string $index)
+    {
+        $this->validateIndexName($index);
+
+        $result = ['code' => 10000,'msg' => 'es删除索引失败','status' => 0,'error' => null];
+
+        $url = "{$this->esHost}/{$index}";
+        $response = httpDelete($url, $this->headers);
+        $jsonResultArray = $this->parseResponse($response);
+
+        /**成功
+         * Array
+            (
+                [acknowledged] => 1
+            )
+         */
+        if (isset($jsonResultArray['acknowledged']) && $jsonResultArray['acknowledged']) {
+            $result['code'] = 0;
+            $result['msg'] = 'es索引删除成功';
+            $result['status'] = 1;
+        }
+
+        /**
+         * 失败=>本来就不存在
+         * Array
+            (
+                [error] => Array
+                    (
+                        [root_cause] => Array
+                            (
+                                [0] => Array
+                                    (
+                                        [type] => index_not_found_exception
+                                        [reason] => no such index [youhu_users_index]
+                                        [resource.type] => index_or_alias
+                                        [resource.id] => youhu_users_index
+                                        [index_uuid] => _na_
+                                        [index] => youhu_users_index
+                                    )
+
+                            )
+
+                        [type] => index_not_found_exception
+                        [reason] => no such index [youhu_users_index]
+                        [resource.type] => index_or_alias
+                        [resource.id] => youhu_users_index
+                        [index_uuid] => _na_
+                        [index] => youhu_users_index
+                    )
+
+                [status] => 404
+            )
+         */
+
+        if (isset($jsonResultArray['error'])) {
+            if (isset($jsonResultArray['status']) && (int)$jsonResultArray['status'] == 404) {
+                $result['code'] = 0;
+                $result['msg'] = 'es索引删除成功';
+                $result['status'] = 1;
+            }
+        }
+
+        $result['error'] = $jsonResultArray;
+
+        return $result;
+    }
+
+
+    /**
+     * 创建文档
+     *
+     * @param string $index 索引名称
+     * @param array $data 文档数据
+     * @param string|null $docId 文档ID，为null时自动生成
+     * @return array  $result 数组信息
      */
     public function createDoc(string $index, array $data, string $docId = null): array
     {
+        $this->validateIndexName($index);
+
+        $result = ['code' => 10000,'msg' => 'es文档创建失败','status' => 0,'error' => null];
+
         // 拼接URL
         if ($docId) {
             // 指定ID创建（PUT）
@@ -101,7 +327,66 @@ class EsFacadeService
             $response = httpPost($url, $this->headers, $data);
         }
 
-        return $this->parseResponse($response);
+        $jsonResultArray =  $this->parseResponse($response);
+
+        /**
+         * 创建成功
+         * Array
+            (
+                [_index] => youhu_users_index
+                [_type] => _doc
+                [_id] => 276406781286953
+                [_version] => 1
+                [result] => created
+                [_shards] => Array
+                    (
+                        [total] => 1
+                        [successful] => 1
+                        [failed] => 0
+                    )
+
+                [_seq_no] => 0
+                [_primary_term] => 1
+            )
+         */
+
+        if (isset($jsonResultArray['result']) && $jsonResultArray['result'] == 'created') {
+            $result['code'] = 0;
+            $result['msg'] = 'es文档创建成功';
+            $result['status'] = 1;
+        }
+
+        /**
+         * 更新成功
+         * Array
+            (
+                [_index] => youhu_users_index
+                [_type] => _doc
+                [_id] => 276406781286953
+                [_version] => 2
+                [result] => updated
+                [_shards] => Array
+                    (
+                        [total] => 1
+                        [successful] => 1
+                        [failed] => 0
+                    )
+
+                [_seq_no] => 1
+                [_primary_term] => 1
+            )
+
+         */
+
+        if (isset($jsonResultArray['result']) && $jsonResultArray['result'] == 'updated') {
+            $result['code'] = 0;
+            $result['msg'] = 'es文档更新成功';
+            $result['status'] = 2;
+        }
+
+        $result['error'] = $jsonResultArray;
+
+        return $result;
     }
 
     /**
@@ -111,11 +396,59 @@ class EsFacadeService
      * @return array 响应结果
      * @throws \Exception
      */
-    public function getDoc(string $index, string $docId): array
+    public function findDoc(string $index, string $docId): array
     {
+        $this->validateIndexName($index);
+
+        $result = ['code' => 10000,'msg' => 'es文档查找失败','status' => 0,'error' => null,'data' => []];
+
         $url = "{$this->esHost}/{$index}/_doc/{$docId}";
         $response = httpGet($url, $this->headers);
-        return $this->parseResponse($response);
+
+        $jsonResultArray = $this->parseResponse($response);
+
+        /**
+         * 成功
+         *
+         Array
+            (
+                [_index] => youhu_users_index
+                [_type] => _doc
+                [_id] => 276406781286953
+                [_version] => 2
+                [_seq_no] => 1
+                [_primary_term] => 1
+                [found] => 1
+                [_source] => Array
+                    (
+                        [phone] =>
+                        [account_name] => develop
+                    )
+
+            )
+         */
+
+        /**
+         * 失败
+            Array
+            (
+                [_index] => youhu_users_index
+                [_type] => _doc
+                [_id] => 276406781286954
+                [found] =>
+            )
+         */
+        if (isset($jsonResultArray['_source']) && isset($jsonResultArray['found']) && $jsonResultArray['found']) {
+            $result['code'] = 0;
+            $result['msg'] = 'es文档查找成功';
+            $result['status'] = 1;
+            $result['data'] = $jsonResultArray['_source'];
+        }
+
+
+        $result['error'] = $jsonResultArray;
+
+        return $result;
     }
 
     /**
@@ -129,6 +462,10 @@ class EsFacadeService
      */
     public function updateDoc(string $index, string $docId, array $data, bool $isPartial = true): array
     {
+        $this->validateIndexName($index);
+
+        $result = ['code' => 10000,'msg' => 'es文档更新失败','status' => 0,'error' => null,'data' => []];
+
         if ($isPartial) {
             // 局部更新（ES推荐方式）
             $url = "{$this->esHost}/{$index}/_update/{$docId}";
@@ -139,8 +476,103 @@ class EsFacadeService
             $postData = $data;
         }
 
-        $response = httpPut($url, $this->headers, $postData);
-        return $this->parseResponse($response);
+        $response = httpPost($url, $this->headers, $postData);
+        $jsonResultArray =  $this->parseResponse($response);
+
+        /**
+         * 无需更新
+         *Array
+            (
+                [_index] => youhu_users_index
+                [_type] => _doc
+                [_id] => 276406781286953
+                [_version] => 2
+                [result] => noop
+                [_shards] => Array
+                    (
+                        [total] => 0
+                        [successful] => 0
+                        [failed] => 0
+                    )
+
+                [_seq_no] => 1
+                [_primary_term] => 1
+            )
+         */
+
+        if (isset($jsonResultArray['result']) && $jsonResultArray['result'] == 'noop') {
+            $result['code'] = 0;
+            $result['msg'] = 'es文档无更新（数据未变化）';
+            $result['status'] = 3; // 新增状态码：3=无操作
+        }
+
+        /**
+         * 更新成功
+         * Array
+            (
+                [_index] => youhu_users_index
+                [_type] => _doc
+                [_id] => 276406781286953
+                [_version] => 3
+                [result] => updated
+                [_shards] => Array
+                    (
+                        [total] => 1
+                        [successful] => 1
+                        [failed] => 0
+                    )
+
+                [_seq_no] => 2
+                [_primary_term] => 1
+            )
+         */
+
+        if (isset($jsonResultArray['result']) && $jsonResultArray['result'] == 'updated') {
+            $result['code'] = 0;
+            $result['msg'] = 'es文档更新成功';
+            $result['status'] = 2;
+        }
+
+
+        if (isset($jsonResultArray['result']) && $jsonResultArray['result'] == 'created') {
+            $result['code'] = 0;
+            $result['msg'] = 'es文档创建成功';
+            $result['status'] = 1;
+        }
+
+        /**
+         * 失败
+         * Array
+            (
+                [error] => Array
+        (
+            [root_cause] => Array
+                (
+                    [0] => Array
+                        (
+                            [type] => document_missing_exception
+                            [reason] => [_doc][276407645251371]: document missing
+                            [index_uuid] => 4uFQOc2dTtmHftB7I1nQmQ
+                            [shard] => 0
+                            [index] => youhu_users_index
+                        )
+
+                )
+
+            [type] => document_missing_exception
+            [reason] => [_doc][276407645251371]: document missing
+            [index_uuid] => 4uFQOc2dTtmHftB7I1nQmQ
+            [shard] => 0
+            [index] => youhu_users_index
+        )
+
+                [status] => 404
+            )
+         */
+
+        $result['error'] = $jsonResultArray;
+
+        return $result;
     }
 
     /**
@@ -152,9 +584,73 @@ class EsFacadeService
      */
     public function deleteDoc(string $index, string $docId): array
     {
+        $this->validateIndexName($index);
+
+        $result = ['code' => 10000,'msg' => 'es文档删除','status' => 0,'error' => null];
+
         $url = "{$this->esHost}/{$index}/_doc/{$docId}";
         $response = httpDelete($url, $this->headers);
-        return $this->parseResponse($response);
+        $jsonResultArray = $this->parseResponse($response);
+
+        /**
+         * 删除成功
+         * Array
+            (
+                [_index] => youhu_users_index
+                [_type] => _doc
+                [_id] => 276406781286953
+                [_version] => 2
+                [result] => deleted
+                [_shards] => Array
+                    (
+                        [total] => 1
+                        [successful] => 1
+                        [failed] => 0
+                    )
+
+                [_seq_no] => 5
+                [_primary_term] => 1
+            )
+         */
+
+        if (isset($jsonResultArray['result']) && $jsonResultArray['result'] == 'deleted') {
+            $result['code'] = 0;
+            $result['msg'] = 'es文档无删除成功';
+            $result['status'] = 1; // 新增状态码：3=无操作
+        }
+
+
+        /**
+         * 不存在数据
+         * Array
+            (
+                [_index] => youhu_users_index
+                [_type] => _doc
+                [_id] => 276406781286953
+                [_version] => 3
+                [result] => not_found
+                [_shards] => Array
+                    (
+                        [total] => 1
+                        [successful] => 1
+                        [failed] => 0
+                    )
+
+                [_seq_no] => 6
+                [_primary_term] => 1
+            )
+         */
+
+
+        if (isset($jsonResultArray['result']) && $jsonResultArray['result'] == 'not_found') {
+            $result['code'] = 0;
+            $result['msg'] = 'es文档不存在';
+            $result['status'] = 4; // 新增状态码：3=无操作
+        }
+
+        $result['error'] = $jsonResultArray;
+
+        return $result;
     }
 
     /**
@@ -168,6 +664,12 @@ class EsFacadeService
      */
     public function searchDoc(string $index, array $query, int $from = 0, int $size = 10): array
     {
+        $this->validateIndexName($index);
+
+
+        $result = ['code' => 10000,'msg' => 'es文档批量查询','status' => 0,'error' => null,'data' => []];
+
+
         $url = "{$this->esHost}/{$index}/_search";
         $postData = [
             'from' => $from,
@@ -176,7 +678,104 @@ class EsFacadeService
         ];
 
         $response = httpPost($url, $this->headers, $postData);
-        return $this->parseResponse($response);
+        $jsonResultArray = $this->parseResponse($response);
+
+        /**
+         * 示例:无数据
+         * Array
+            (
+                [took] => 0
+                [timed_out] =>
+                [_shards] => Array
+                    (
+                        [total] => 1
+                        [successful] => 1
+                        [skipped] => 0
+                        [failed] => 0
+                    )
+
+                [hits] => Array
+                    (
+                        [total] => Array
+                            (
+                                [value] => 0
+                                [relation] => eq
+                            )
+
+                        [max_score] =>
+                        [hits] => Array
+                            (
+                            )
+
+                    )
+
+            )
+         * 示例:有数据
+         * Array
+            (
+                [took] => 0
+                [timed_out] =>
+                [_shards] => Array
+                    (
+                        [total] => 1
+                        [successful] => 1
+                        [skipped] => 0
+                        [failed] => 0
+                    )
+
+                [hits] => Array
+                    (
+                        [total] => Array
+                            (
+                                [value] => 1
+                                [relation] => eq
+                            )
+
+                        [max_score] => 0.2876821
+                        [hits] => Array
+                            (
+                                [0] => Array
+                                    (
+                                        [_index] => youhu_users_index
+                                        [_type] => _doc
+                                        [_id] => 276406781286953
+                                        [_score] => 0.2876821
+                                        [_source] => Array
+                                            (
+                                                [phone] => 15688523140
+                                                [account_name] => develop
+                                                [email] =>
+                                                [account_status] => 1
+                                                [real_auth_status] => 10
+                                                [created_at] => 2026-02-12 02:18:20
+                                                [id_number] =>
+                                                [nick_name] => developer
+                                                [real_name] =>
+                                                [sex] => 0
+                                                [solar_birthday_at] =>
+                                                [chinese_birthday_at] =>
+                                            )
+
+                                    )
+
+                            )
+
+                    )
+
+            )
+            */
+
+        if (isset($jsonResultArray['hits'])) {
+            $result['code'] = 0;
+            $result['msg'] = 'es文档批量查询';
+            $result['status'] = 1;
+            $result['data'] = $jsonResultArray;
+        }
+
+
+        $result['data'] = $jsonResultArray;
+
+        return $result;
     }
 
     /**
@@ -188,60 +787,176 @@ class EsFacadeService
      */
     public function deleteByQuery(string $index, array $query): array
     {
+        $this->validateIndexName($index);
+
+
+        $result = ['code' => 10000,'msg' => 'es文档批量删除','status' => 0,'error' => null];
+
+
         $url = "{$this->esHost}/{$index}/_delete_by_query";
         $postData = ['query' => $query];
-        $response = httpDelete($url, $this->headers, $postData);
-        return $this->parseResponse($response);
-    }
+        $response = httpPost($url, $this->headers, $postData);
 
-    /**
-     * 检查索引是否存在
-     * @param string $index 索引名
-     * @return bool 存在返回true，否则false
-     * @throws \Exception
-     */
-    public function indexExists(string $index): bool
-    {
-        try {
-            $url = "{$this->esHost}/{$index}";
-            httpGet($url, $this->headers);
-            return true;
-        } catch (\Exception $e) {
-            // ES返回404表示索引不存在
-            if (strpos($e->getMessage(), '404') !== false) {
-                return false;
-            }
-            throw $e; // 其他错误正常抛出
+        $jsonResultArray = $this->parseResponse($response);
+
+
+        /**
+         * 删除成功
+         * Array
+            (
+                [took] => 22
+                [timed_out] =>
+                [total] => 1
+                [deleted] => 1
+                [batches] => 1
+                [version_conflicts] => 0
+                [noops] => 0
+                [retries] => Array
+                    (
+                        [bulk] => 0
+                        [search] => 0
+                    )
+
+                [throttled_millis] => 0
+                [requests_per_second] => -1
+                [throttled_until_millis] => 0
+                [failures] => Array
+                    (
+                    )
+
+            )
+         */
+
+        /**无数据删除
+         * Array
+            (
+                [took] => 0
+                [timed_out] =>
+                [total] => 0
+                [deleted] => 0
+                [batches] => 0
+                [version_conflicts] => 0
+                [noops] => 0
+                [retries] => Array
+                    (
+                        [bulk] => 0
+                        [search] => 0
+                    )
+
+                [throttled_millis] => 0
+                [requests_per_second] => -1
+                [throttled_until_millis] => 0
+                [failures] => Array
+                    (
+                    )
+
+            )
+         */
+
+        if (isset($jsonResultArray['total'])) {
+            $result['code'] = 0;
+            $result['msg'] = 'es文档批量删除成功';
+            $result['status'] = 1;
         }
+
+        $result['error'] = $jsonResultArray;
+
+        return $result;
     }
 
     /**
-     * 创建索引（带映射配置）
-     * @param string $index 索引名
-     * @param array $mapping 索引映射配置（可选）
-     * @return array 响应结果
-     * @throws \Exception
+     * 批量写入/更新文档（直接调用ES _bulk API）
+     *
+     * @param string $index 索引名称
+     * @param array $data 批量数据（每条含 _docId 字段）
+     * @return array 统一格式的操作结果
      */
-    public function createIndex(string $index, array $mapping = []): array
+    public function batchActDoc(string $index, array $data): array
     {
-        $url = "{$this->esHost}/{$index}";
-        $postData = !empty($mapping) ? ['mappings' => $mapping] : [];
-        $response = httpPut($url, $this->headers, $postData);
-        return $this->parseResponse($response);
+        $this->validateIndexName($index);
+
+        // 统一返回格式（和其他方法保持一致）
+        $result = ['code' => 10000,'msg' => 'es批量写入失败','status' => 0,'error' => null];
+
+        // 空数据直接返回成功
+        if (empty($data)) {
+            $result['code'] = 0;
+            $result['msg'] = 'es批量写入成功（无数据）';
+            $result['status'] = 1;
+            return $result;
+        }
+
+        // 拼接bulk数据
+        $url = "{$this->esHost}/_bulk";
+        $bulkData = '';
+        foreach ($data as $item) {
+            $id = $item['_docId'] ?? null;
+            unset($item['_docId']);
+            $bulkData .= json_encode(['index' => ['_index' => $index, '_id' => $id]]) . "\n";
+            $bulkData .= json_encode($item, JSON_UNESCAPED_UNICODE) . "\n";
+        }
+
+        // 发送请求并解析
+        $response = httpPost($url, $this->headers, $bulkData);
+        $jsonResultArray = $this->parseResponse($response);
+
+        // 判断是否成功（ES bulk返回errors=false表示全部成功）
+        if (!isset($jsonResultArray['errors']) || $jsonResultArray['errors'] === false) {
+            $result['code'] = 0;
+            $result['msg'] = 'es批量写入成功';
+            $result['status'] = 1;
+        }
+        $result['error'] = $jsonResultArray;
+
+        return $result;
     }
 
     /**
-     * 删除索引
-     * @param string $index 索引名
-     * @return array 响应结果
-     * @throws \Exception
+     * 批量删除文档（支持单ID/多ID/条件删除）
+     *
+     * @param string $index 索引名称
+     * @param string|array $dataOrCondition 删除条件：
+     *                                     - 字符串：单个文档ID
+     *                                     - 数组（一维）：多个文档ID ['1','2','3']
+     *                                     - 数组（二维）：ES查询条件 ['match' => ['title' => '测试']]
+     * @return array 统一格式的操作结果
      */
-    public function deleteIndex(string $index): array
+    public function batchDeleteDoc(string $index, string|array $dataOrCondition): array
     {
-        $url = "{$this->esHost}/{$index}";
-        $response = httpDelete($url, $this->headers);
-        return $this->parseResponse($response);
+        $this->validateIndexName($index);
+
+        // 统一返回格式
+        $result = ['code' => 10000,'msg' => 'es批量删除失败','status' => 0,'error' => null];
+
+        // 1. 单个文档ID删除
+        if (is_scalar($dataOrCondition)) {
+            $result = $this->deleteDoc($index, $dataOrCondition);
+        }
+        // 2. 多个文档ID删除（一维数组）
+        elseif (is_array($dataOrCondition) && isset($dataOrCondition[0]) && is_scalar($dataOrCondition[0])) {
+            $url = "{$this->esHost}/_bulk";
+            $bulkData = '';
+            foreach ($dataOrCondition as $docId) {
+                $bulkData .= json_encode(['delete' => ['_index' => $index, '_id' => $docId]]) . "\n";
+            }
+            $response = httpPost($url, $this->headers, $bulkData);
+            $jsonResultArray = $this->parseResponse($response);
+
+            if (!isset($jsonResultArray['errors']) || $jsonResultArray['errors'] === false) {
+                $result['code'] = 0;
+                $result['msg'] = 'es批量删除成功';
+                $result['status'] = 1;
+            }
+            $result['error'] = $jsonResultArray;
+        }
+        // 3. 条件删除（二维数组）
+        elseif (is_array($dataOrCondition) && !isset($dataOrCondition[0])) {
+            $result = $this->deleteByQuery($index, $dataOrCondition);
+        }
+
+        return $result;
     }
+
 
     /**
      * 解析ES响应结果（转为数组）
@@ -252,17 +967,12 @@ class EsFacadeService
     private function parseResponse(string $response): array
     {
         if (empty($response)) {
-            throw new CommonException('ES响应为空');
+            throw new CommonException('ResponseEmptyError');
         }
 
         $result = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new CommonException('ES响应解析失败：' . json_last_error_msg());
-        }
-
-        // ES返回错误时抛出异常
-        if (isset($result['error'])) {
-            throw new CommonException("ES操作失败：{$result['error']['reason']}", $result['status']);
+            throw new CommonException('ResponseConvertError');
         }
 
         return $result;
@@ -295,107 +1005,31 @@ class EsFacadeService
                 $response = httpDelete($url, $this->headers, $data);
                 break;
             default:
-                throw new CommonException("不支持的请求方法：{$method}");
+                throw new CommonException('CustomRequestMethodError');
         }
 
         return $this->parseResponse($response);
     }
 
-
-	 /**
-     * 注册数据同步钩子（闭包方式）
-     * @param \Closure $hook 同步钩子（接收 index/data/docId 参数）
-     * @return $this
-     */
-    public function registerSyncHook(\Closure $hook): self
-    {
-        $this->syncHook = $hook;
-        return $this;
-    }
-
     /**
-     * 注册数据同步接口实现（接口方式）
-     * @param EsDataSyncContract $contract 同步接口实现类
-     * @return $this
+     * 验证 Elasticsearch 索引名称是否符合规范
+     *
+     * 索引名称规则：
+     * - 必须小写
+     * - 只能包含字母、数字、下划线、短横线
+     * - 不能以短横线开头
+     *
+     * @param string $index 待验证的索引名称
+     * @throws CommonException 当索引名称不符合规范时抛出异常
+     * @return void
      */
-    public function registerSyncContract(EsDataSyncContract $contract): self
+    private function validateIndexName(string $index): void
     {
-        $this->syncContract = $contract;
-        return $this;
-    }
+        // ES索引名规范：小写、只能包含字母/数字/下划线/短横线，不能以-开头
+        $result = preg_match('/^[a-z0-9_][a-z0-9_\-]*$/', $index) === 1;
 
-	/**
-     * 执行数据同步（自动适配钩子/接口方式）
-     * @param string $type 同步类型：single/batch/delete
-     * @param string $index 索引名
-     * @param array $data 同步数据
-     * @param string|null $docId 文档ID（仅单条同步用）
-     * @return array 同步结果
-     * @throws CommonException
-     */
-    public function syncData(string $type, string $index, array $data, string $docId = null): array
-    {
-        // 优先级：接口方式 > 钩子方式 > 默认ES原生操作
-        try {
-            // 1. 接口方式同步
-            if ($this->syncContract) {
-                switch ($type) {
-                    case 'single':
-                        return $this->syncContract->syncSingle($index, $data, $docId);
-                    case 'batch':
-                        return $this->syncContract->syncBatch($index, $data);
-                    case 'delete':
-                        return $this->syncContract->syncDelete($index, $docId ?? $data);
-                    default:
-                        throw new CommonException("不支持的同步类型：{$type}");
-                }
-            }
-
-            // 2. 钩子方式同步
-            if ($this->syncHook) {
-                $hook = $this->syncHook;
-                return $hook($type, $index, $data, $docId);
-            }
-
-            // 3. 默认ES原生操作（兜底）
-            return $this->defaultSync($type, $index, $data, $docId);
-        } catch (\Exception $e) {
-            throw new CommonException("数据同步失败：{$e->getMessage()}", $e->getCode());
-        }
-    }
-
-    /**
-     * 默认ES原生同步（兜底方案）
-     * @param string $type 同步类型
-     * @param string $index 索引名
-     * @param array $data 同步数据
-     * @param string|null $docId 文档ID
-     * @return array
-     * @throws CommonException
-     */
-    private function defaultSync(string $type, string $index, array $data, string $docId = null): array
-    {
-        switch ($type) {
-            case 'single':
-                return $this->createDoc($index, $data, $docId);
-            case 'batch':
-                // ES批量同步（_bulk API）
-                $url = "{$this->esHost}/_bulk";
-                $bulkData = '';
-                foreach ($data as $item) {
-                    $id = $item['_id'] ?? null;
-                    unset($item['_id']);
-                    
-                    // 批量新增/更新
-                    $bulkData .= json_encode(['index' => ['_index' => $index, '_id' => $id]]) . "\n";
-                    $bulkData .= json_encode($item, JSON_UNESCAPED_UNICODE) . "\n";
-                }
-                $response = httpPost($url, $this->headers, $bulkData);
-                return $this->parseResponse($response);
-            case 'delete':
-                return $this->deleteDoc($index, $docId ?? $data['doc_id']);
-            default:
-                throw new CommonException("不支持的同步类型：{$type}");
+        if (!$result) {
+            throw new CommonException("EsIndexError");
         }
     }
 }

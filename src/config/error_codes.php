@@ -1,12 +1,13 @@
 <?php
+
 /*
  * @Descripttion: 组件包通用错误码配置文件
  * @version: v1
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-01-06 00:01:25
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-02-27 08:09:50
- * @FilePath: \youhu-laravel-api-12d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\config\error-codes.php
+ * @LastEditTime: 2026-03-17 19:47:25
+ * @FilePath: \youhu-laravel-api-12d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\config\error_codes.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
 
@@ -62,58 +63,58 @@ $systemCodeArray =  [
     ],
 
     // ========== 微信公众号相关错误码 (50000-50999) ==========
-   
+
 ];
 /**
  * excel错误码
  */
 $excelCodeArray = [
-	'ExcelImportError' => [
+    'ExcelImportError' => [
         'code' => 11010,
         'error' => 'ExcelImportError',
         'msg' => 'Excel导入失败'
     ],
-	'FailedCreateDirectory' =>[
-		'code' => 11020,
+    'FailedCreateDirectory' => [
+        'code' => 11020,
         'error' => 'FailedCreateDirectory',
         'msg' => '创建目录失败'
-	]
+    ]
 ];
 /**
  * 日历相关错误码
  */
 $calendarCodeArray = [
-	'DateRangeError' => [
+    'DateRangeError' => [
         'code' => 12010,
         'error' => 'DateRangeError',
         'msg' => '超出日期范围'
     ],
-	'DateFormatError' => [
+    'DateFormatError' => [
         'code' => 12020,
         'error' => 'DateFormatError',
         'msg' => '日期格式错误'
     ],
-	'SolarDateError' => [
+    'SolarDateError' => [
         'code' => 12030,
         'error' => 'SolarDateError',
         'msg' => '公历日期错误'
     ],
-	'LunarDateFormatError' => [
+    'LunarDateFormatError' => [
         'code' => 12040,
         'error' => 'LunarDateFormatError',
         'msg' => '农历日期格式错误'
     ],
-	'YearOutOfRange' => [
+    'YearOutOfRange' => [
         'code' => 12050,
         'error' => 'YearOutOfRange',
         'msg' => '年份超出范围'
     ],
-	'MonthOutOfRange' => [
+    'MonthOutOfRange' => [
         'code' => 12060,
         'error' => 'MonthOutOfRange',
         'msg' => '月份超出范围'
     ],
-	'DayOutOfRange' => [
+    'DayOutOfRange' => [
         'code' => 12070,
         'error' => 'DayOutOfRange',
         'msg' => '日期超出范围'
@@ -123,7 +124,7 @@ $calendarCodeArray = [
  * 微信错误码
  */
 $wechatCodeArray = [
-	 'WechatOfficialConfigNotSet' => [
+    'WechatOfficialConfigNotSet' => [
         'code' => 50000,
         'error' => 'WechatOfficialConfigNotSet',
         'msg' => '微信配置未设置'
@@ -215,7 +216,7 @@ $wechatCodeArray = [
  * 地图错误码
  */
 $mapCodeArray = [
-	 // ========== 腾讯地图相关错误码 (60000-60999) ==========
+    // ========== 腾讯地图相关错误码 (60000-60999) ==========
     'TencentMapNoKeyError' => [
         'code' => 60000,
         'error' => 'TencentMapNoKeyError',
@@ -568,7 +569,7 @@ $qiNiuCodeArray = [
 //shard数据库分库分表
 $qiNiuCodeArray = [
 
-	'ShardKeyEmptyError' => [
+    'ShardKeyEmptyError' => [
         'code' => 10000,
         'error' => 'ShardKeyEmptyError',
         'msg' => '分片标识未初始化'
@@ -576,17 +577,43 @@ $qiNiuCodeArray = [
 
 ];
 
+//es返回码
+$esCodeArray = [
+    'ResponseEmptyError' => [
+        'code' => 10000,
+        'error' => 'ResponseEmptyError',
+        'msg' => 'ES响应为空'
+    ],
+    'ResponseConvertError' => [
+        'code' => 10000,
+        'error' => 'ResponseConvertError',
+        'msg' => 'json解析失败'
+    ],
+    'EsIndexError' => [
+        'code' => 10000,
+        'error' => 'EsIndexError',
+        'msg' => 'Es索引错误'
+    ],
+	'CustomRequestMethodError'=>[
+		'code' => 10000,
+        'error' => 'CustomRequestMethodError',
+        'msg' => '不支持的自定义方法'
+	],
+
+];
+
 $errorCodeArray = array_merge(
     $systemCodeArray,
-	$excelCodeArray,
-	$calendarCodeArray,
+    $excelCodeArray,
+    $calendarCodeArray,
     $wechatCodeArray,
-	$mapCodeArray,
+    $mapCodeArray,
     $smsCodeArray,
     $qrcodeCodeArray,
     $douyinCodeArray,
     $secretCodeArray,
-    $qiNiuCodeArray
+    $qiNiuCodeArray,
+    $esCodeArray
 );
 
- return $errorCodeArray;
+return $errorCodeArray;
