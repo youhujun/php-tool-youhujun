@@ -154,14 +154,14 @@ if (!function_exists('total')) {
     }
 }
 
-if (!function_exists('toArray')) {
+if (!function_exists('to_array')) {
     /**
      * 将数组每个元素转为单元素数组
      *
      * @param mixed $array 输入数据（非数组直接返回）
      * @return array 处理后的数组
      */
-    function toArray($array): array
+    function to_array($array): array
     {
         if (!is_array($array)) {
             return []; // 非数组返回空数组，避免报错
@@ -177,14 +177,14 @@ if (!function_exists('toArray')) {
 }
 
 // ID合法性检查
-if (!function_exists('checkId')) {
+if (!function_exists('check_id')) {
     /**
      * 检查ID是否为纯数字
      *
      * @param mixed $id 待检查ID
      * @return int 有效ID返回自身，无效返回0
      */
-    function checkId($id): int
+    function check_id($id): int
     {
         // 简化正则 + 强制转整型，更严谨
         return preg_match('/^\d+$/', (string)$id) ? (int)$id : 0;

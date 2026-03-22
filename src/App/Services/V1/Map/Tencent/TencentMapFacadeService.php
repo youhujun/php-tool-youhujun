@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @Descripttion: 腾讯地图服务
  * @version: v1
@@ -55,14 +56,14 @@ class TencentMapFacadeService
         $url = "{$regionUrl}?location={$latitude},{$longitude}&key={$key}";
 
         // 发送HTTP GET请求
-        $response = httpGet($url);
+        $response = http_get($url);
         $httpGetObjectResult = json_decode($response);
 
         // 检查返回结果
         if (!isset($httpGetObjectResult->status) || $httpGetObjectResult->status != 0) {
             // 可以记录日志
             // error_log('腾讯地图API错误: ' . json_encode($httpGetObjectResult));
-            
+
             throw new CommonException('GetLocationRegionByH5TencentMapError');
         }
 
@@ -84,7 +85,7 @@ class TencentMapFacadeService
     public function getLocationRegionByH5Object(array $config, array $locationData): object
     {
         $resultArray = $this->getLocationRegionByH5($config, $locationData);
-        
+
         return (object)$resultArray;
     }
 
@@ -112,7 +113,7 @@ class TencentMapFacadeService
         $url = "{$geocoderUrl}?address=" . urlencode($address) . "&key={$key}";
 
         // 发送HTTP GET请求
-        $response = httpGet($url);
+        $response = http_get($url);
         $result = json_decode($response);
 
         // 检查返回结果
@@ -151,7 +152,7 @@ class TencentMapFacadeService
         $url = "{$distanceUrl}?mode={$mode}&from={$fromStr}&to={$toStr}&key={$key}";
 
         // 发送HTTP GET请求
-        $response = httpGet($url);
+        $response = http_get($url);
         $result = json_decode($response);
 
         // 检查返回结果

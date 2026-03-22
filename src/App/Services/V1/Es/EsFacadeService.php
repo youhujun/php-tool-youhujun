@@ -90,7 +90,7 @@ class EsFacadeService
         $this->validateIndexName($index);
 
         $url = "{$this->esHost}/{$index}";
-        $response = httpHead($url, $this->headers);
+        $response =http_head($url, $this->headers);
 
         //成功
         //HTTP/1.1 200 OKX-elastic-product: Elasticsearchcontent-type: application/json; charset=UTF-8content-length: 1057
@@ -128,7 +128,7 @@ class EsFacadeService
         $result = ['code' => 10000,'msg' => 'es索引创建失败','status' => 0,'error' => null];
 
         $url = "{$this->esHost}/{$index}";
-        $response = httpPut($url, $this->headers, $body);
+        $response = http_put($url, $this->headers, $body);
         $jsonResultArray = $this->parseResponse($response);
 
         /**
@@ -208,7 +208,7 @@ class EsFacadeService
 
         // ES 更新映射的固定接口：/_mapping
         $url = "{$this->esHost}/{$index}/_mapping";
-        $response = httpPut($url, $this->headers, $body);
+        $response = http_put($url, $this->headers, $body);
         $jsonResultArray = $this->parseResponse($response);
 
         /**
@@ -241,7 +241,7 @@ class EsFacadeService
         $result = ['code' => 10000,'msg' => 'es删除索引失败','status' => 0,'error' => null];
 
         $url = "{$this->esHost}/{$index}";
-        $response = httpDelete($url, $this->headers);
+        $response = http_delete($url, $this->headers);
         $jsonResultArray = $this->parseResponse($response);
 
         /**成功
@@ -320,11 +320,11 @@ class EsFacadeService
         if ($docId) {
             // 指定ID创建（PUT）
             $url = "{$this->esHost}/{$index}/_doc/{$docId}";
-            $response = httpPut($url, $this->headers, $data);
+            $response = http_put($url, $this->headers, $data);
         } else {
             // 自动生成ID（POST）
             $url = "{$this->esHost}/{$index}/_doc";
-            $response = httpPost($url, $this->headers, $data);
+            $response = http_post($url, $this->headers, $data);
         }
 
         $jsonResultArray =  $this->parseResponse($response);
@@ -403,7 +403,7 @@ class EsFacadeService
         $result = ['code' => 10000,'msg' => 'es文档查找失败','status' => 0,'error' => null,'data' => []];
 
         $url = "{$this->esHost}/{$index}/_doc/{$docId}";
-        $response = httpGet($url, $this->headers);
+        $response = http_get($url, $this->headers);
 
         $jsonResultArray = $this->parseResponse($response);
 
@@ -476,7 +476,7 @@ class EsFacadeService
             $postData = $data;
         }
 
-        $response = httpPost($url, $this->headers, $postData);
+        $response = http_post($url, $this->headers, $postData);
         $jsonResultArray =  $this->parseResponse($response);
 
         /**
@@ -589,7 +589,7 @@ class EsFacadeService
         $result = ['code' => 10000,'msg' => 'es文档删除','status' => 0,'error' => null];
 
         $url = "{$this->esHost}/{$index}/_doc/{$docId}";
-        $response = httpDelete($url, $this->headers);
+        $response = http_delete($url, $this->headers);
         $jsonResultArray = $this->parseResponse($response);
 
         /**
@@ -677,7 +677,7 @@ class EsFacadeService
             'query' => $query
         ];
 
-        $response = httpPost($url, $this->headers, $postData);
+        $response = http_post($url, $this->headers, $postData);
         $jsonResultArray = $this->parseResponse($response);
 
         /**
@@ -795,7 +795,7 @@ class EsFacadeService
 
         $url = "{$this->esHost}/{$index}/_delete_by_query";
         $postData = ['query' => $query];
-        $response = httpPost($url, $this->headers, $postData);
+        $response = http_post($url, $this->headers, $postData);
 
         $jsonResultArray = $this->parseResponse($response);
 
@@ -897,7 +897,7 @@ class EsFacadeService
         }
 
         // 发送请求并解析
-        $response = httpPost($url, $this->headers, $bulkData);
+        $response = http_post($url, $this->headers, $bulkData);
         $jsonResultArray = $this->parseResponse($response);
 
         // 判断是否成功（ES bulk返回errors=false表示全部成功）
@@ -939,7 +939,7 @@ class EsFacadeService
             foreach ($dataOrCondition as $docId) {
                 $bulkData .= json_encode(['delete' => ['_index' => $index, '_id' => $docId]]) . "\n";
             }
-            $response = httpPost($url, $this->headers, $bulkData);
+            $response = http_post($url, $this->headers, $bulkData);
             $jsonResultArray = $this->parseResponse($response);
 
             if (!isset($jsonResultArray['errors']) || $jsonResultArray['errors'] === false) {
@@ -993,16 +993,16 @@ class EsFacadeService
 
         switch ($method) {
             case 'GET':
-                $response = httpGet($url, $this->headers);
+                $response = http_get($url, $this->headers);
                 break;
             case 'POST':
-                $response = httpPost($url, $this->headers, $data);
+                $response = http_post($url, $this->headers, $data);
                 break;
             case 'PUT':
-                $response = httpPut($url, $this->headers, $data);
+                $response = http_put($url, $this->headers, $data);
                 break;
             case 'DELETE':
-                $response = httpDelete($url, $this->headers, $data);
+                $response = http_delete($url, $this->headers, $data);
                 break;
             default:
                 throw new CommonException('CustomRequestMethodError');

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @Descripttion: 抖音登录服务
  * @version: v1
@@ -52,7 +53,7 @@ class DouYinLoginFacadeService
         $url = "https://minigame.zijieapi.com/mgplatform/api/apps/jscode2session?appid={$appid}&secret={$secret}&code={$code}&anonymousCode={$anonymousCode}";
 
         // 发送HTTP GET请求
-        $response = httpGet($url);
+        $response = http_get($url);
 
         // 解析响应
         $result = json_decode($response, true);
@@ -111,7 +112,7 @@ class DouYinLoginFacadeService
         ];
 
         // 发送HTTP POST请求
-        $response = httpPost($url, $headers, json_encode($data));
+        $response = http_post($url, $headers, json_encode($data));
 
         // 解析响应
         $result = json_decode($response, true);

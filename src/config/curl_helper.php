@@ -2,7 +2,7 @@
 
 
 // HTTP请求相关
-if (!function_exists('httpGet')) {
+if (!function_exists('http_get')) {
     /**
      * CURL GET请求
      *
@@ -11,7 +11,7 @@ if (!function_exists('httpGet')) {
      * @return string|false 请求结果（失败返回false）
      * @throws Exception 请求超时/失败抛出异常
      */
-    function httpGet($url, $headers = [])
+    function http_get($url, $headers = [])
     {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new Exception('无效的URL地址');
@@ -52,7 +52,7 @@ if (!function_exists('httpGet')) {
 }
 
 
-if (!function_exists('httpPost')) {
+if (!function_exists('http_post')) {
     /**
      * CURL POST请求
      *
@@ -62,7 +62,7 @@ if (!function_exists('httpPost')) {
      * @return string|false 请求结果（失败返回false）
      * @throws Exception 请求异常抛出
      */
-    function httpPost($url, $headers = [], $data = null)
+    function http_post($url, $headers = [], $data = null)
     {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new Exception('无效的URL地址');
@@ -114,8 +114,8 @@ if (!function_exists('httpPost')) {
  * @return string|false 请求结果（失败返回false）
  * @throws Exception 请求异常抛出
  */
-if (!function_exists('httpPut')) {
-    function httpPut($url, $headers = [], $data = null)
+if (!function_exists('http_put')) {
+    function http_put($url, $headers = [], $data = null)
     {
         // URL 合法性校验（和 POST/GET 保持一致）
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
@@ -170,8 +170,8 @@ if (!function_exists('httpPut')) {
  * @return string|false 请求结果（失败返回false）
  * @throws Exception 请求异常抛出
  */
-if (!function_exists('httpDelete')) {
-    function httpDelete($url, $headers = [], $data = null)
+if (!function_exists('http_delete')) {
+    function http_delete($url, $headers = [], $data = null)
     {
         // URL 合法性校验
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
@@ -224,8 +224,8 @@ if (!function_exists('httpDelete')) {
      * @return string 请求结果（返回完整响应头，失败抛异常）
      * @throws Exception 请求异常/无效URL抛出
      */
-    if (!function_exists('httpHead')) {
-        function httpHead($url, $headers = [])
+    if (!function_exists('http_head')) {
+        function http_head($url, $headers = [])
         {
             // 1. URL 合法性校验（和其他HTTP函数保持一致）
             if (!filter_var($url, FILTER_VALIDATE_URL)) {

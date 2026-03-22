@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @Descripttion: 微信小程序服务
  * @version: v1
@@ -52,7 +53,7 @@ class WechatMiniProgramFacadeService
         $url = "https://api.weixin.qq.com/sns/jscode2session?appid={$appid}&secret={$secret}&js_code={$code}&grant_type=authorization_code";
 
         // 发送HTTP GET请求
-        $response = httpGet($url);
+        $response = http_get($url);
 
         // 解析响应
         $result = json_decode($response, true);

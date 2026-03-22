@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @Descripttion: 微信公众号网页授权服务
  * @version: v1
@@ -66,7 +67,7 @@ class WechatOfficialWebAuthFacadeService
 
         $url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={$appid}&secret={$appsecret}&code={$code}&grant_type=authorization_code";
 
-        $response = httpGet($url);
+        $response = http_get($url);
         $result = json_decode($response, true) ?: [];
 
         // 检查是否有错误
@@ -90,7 +91,7 @@ class WechatOfficialWebAuthFacadeService
     {
         $url = "https://api.weixin.qq.com/sns/userinfo?access_token={$accessToken}&openid={$openid}&lang={$lang}";
 
-        $response = httpGet($url);
+        $response = http_get($url);
         $result = json_decode($response, true) ?: [];
 
         if (!isset($result['openid'])) {
@@ -137,7 +138,7 @@ class WechatOfficialWebAuthFacadeService
 
         $url = "https://api.weixin.qq.com/sns/oauth2/refresh_token?appid={$appid}&grant_type=refresh_token&refresh_token={$refreshToken}";
 
-        $response = httpGet($url);
+        $response = http_get($url);
         $result = json_decode($response, true) ?: [];
 
         if (isset($result['errcode'])) {
@@ -158,7 +159,7 @@ class WechatOfficialWebAuthFacadeService
     {
         $url = "https://api.weixin.qq.com/sns/auth?access_token={$accessToken}&openid={$openid}";
 
-        $response = httpGet($url);
+        $response = http_get($url);
         $result = json_decode($response, true) ?: [];
 
         return isset($result['errcode']) && $result['errcode'] == 0;
