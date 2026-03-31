@@ -142,7 +142,7 @@ class WechatAuthController extends Controller
             );
 
             // 查找或创建用户
-            $user = User::updateOrCreate(
+            $userObject = User::updateOrCreate(
                 ['openid' => $result['openid']],
                 [
                     'nickname' => $result['userinfo']['nickname'],
@@ -154,7 +154,7 @@ class WechatAuthController extends Controller
             );
 
             // 登录用户
-            auth()->login($user);
+            auth()->login($userObject);
 
             return redirect('/home');
 

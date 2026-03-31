@@ -69,7 +69,7 @@ class UserController extends Controller
 {
     public function showBirthday($id)
     {
-        $user = \App\Models\User::find($id);
+        $userObject = \App\Models\User::find($id);
 
         // 假设用户生日是农历 1990年5月20日
         $userLunarBirthday = '1990-05-20';
@@ -155,10 +155,10 @@ use YouHuJun\Tool\App\Facades\V1\Calendar\CalendarFacade;
 
 class BirthdayService
 {
-    public function getNextBirthday($user)
+    public function getNextBirthday($userObject)
     {
         // 假设用户的农历生日是 '1990-05-20'
-        $userLunarBirthday = $user->lunar_birthday; // '1990-05-20'
+        $userLunarBirthday = $userObject->lunar_birthday; // '1990-05-20'
 
         // 获取今天的阳历日期
         $today = date('Y-m-d');

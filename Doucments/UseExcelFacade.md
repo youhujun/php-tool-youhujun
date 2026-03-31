@@ -116,11 +116,11 @@ class UserController extends Controller
         $column = [['姓名', '年龄', '性别']];
 
         // 准备数据
-        $data = $users->map(function($user) {
+        $data = $users->map(function($userObject) {
             return [
-                $user->name,
-                $user->age,
-                $user->gender
+                $userObject->name,
+                $userObject->age,
+                $userObject->gender
             ];
         })->toArray();
 

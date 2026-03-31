@@ -448,7 +448,7 @@ DB::table('users')->insert([
 ]);
 
 // 从数据库读取
-$storedId = $user->id;  // 已是int类型
+$storedId = $userObject->id;  // 已是int类型
 ```
 
 ### 3. 错误处理

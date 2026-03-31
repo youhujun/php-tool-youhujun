@@ -221,20 +221,20 @@ $baseConfig = [
     'size' => 300,
 ];
 
-foreach ($users as $user) {
+foreach ($users as $userObject) {
     $config = array_merge($baseConfig, [
-        'qrcodePath' => '/var/www/storage/user/qrcode/' . $user['id'] . '.png',
+        'qrcodePath' => '/var/www/storage/user/qrcode/' . $userObject['id'] . '.png',
     ]);
 
     $params = [
-        'data' => 'https://example.com/share?code=' . $user['inviteCode'],
+        'data' => 'https://example.com/share?code=' . $userObject['inviteCode'],
     ];
 
     try {
         $savePath = QrcodeFacade::makeQrcode($config, $params, 1);
-        echo "用户 {$user['id']} 的二维码已保存: " . $savePath . "\n";
+        echo "用户 {$userObject['id']} 的二维码已保存: " . $savePath . "\n";
     } catch (CommonException $e) {
-        echo "用户 {$user['id']} 的二维码生成失败: " . $e->getMessage() . "\n";
+        echo "用户 {$userObject['id']} 的二维码生成失败: " . $e->getMessage() . "\n";
     }
 }
 ```

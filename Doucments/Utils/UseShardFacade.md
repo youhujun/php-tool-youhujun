@@ -370,7 +370,7 @@ class UserRepository
         $tableName = ShardFacade::getTableName($userId, 'users', 'youhujun');
 
         // 根据分片信息查询数据库
-        // $user = DB::connection($shard['db'])
+        // $userObject = DB::connection($shard['db'])
         //           ->table($tableName)
         //           ->where('id', $userId)
         //           ->first();
@@ -408,7 +408,7 @@ class UserRepository
 
 // 使用示例
 $repo = new UserRepository();
-$user = $repo->getUser(1001);
+$userObject = $repo->getUser(1001);
 // 输出:
 // 数据库: user_db_1
 // 表名: users_1
