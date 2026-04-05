@@ -48,7 +48,7 @@ use YouHuJun\Tool\App\Facades\V1\Utils\Sign\AuthSignFacade;
 
 // 示例1: 基础签名
 $params = [
-    'user_id' => 123,
+    'user_uid' => 123,
     'timestamp' => time(),
     'action' => 'login'
 ];
@@ -62,7 +62,7 @@ $params = [
     'api_key' => 'test-api-key',
     'timestamp' => 1673935200,
     'nonce' => 'abc123',
-    'user_id' => 456,
+    'user_uid' => 456,
     'action' => 'update_profile',
     'data' => json_encode(['name' => '张三', 'age' => 25])
 ];
@@ -133,7 +133,7 @@ $apiSecret = 'app-secret-key-123456';
 
 // 构建请求
 $request = buildAPIRequest([
-    'user_id' => 123,
+    'user_uid' => 123,
     'action' => 'get_user_info'
 ], $apiKey, $apiSecret);
 
@@ -210,7 +210,7 @@ $webhookRequest = [
     'event_type' => 'order.created',
     'timestamp' => time(),
     'order_id' => 'ORD20240217001',
-    'user_id' => 123,
+    'user_uid' => 123,
     'amount' => 99.00,
     'data' => json_encode(['product_id' => 'PROD001'])
 ];
@@ -269,7 +269,7 @@ $appKey = 'your-app-key';
 $appSecret = 'your-app-secret';
 
 $params = [
-    'user_id' => 123,
+    'user_uid' => 123,
     'product_id' => 'PROD001',
     'quantity' => 2,
     'amount' => 198.00
@@ -294,7 +294,7 @@ function generateActionSignature(string $userId, string $action, array $actionDa
     $secretKey = 'action-secret-key-' . $userId; // 每个用户独立的密钥
 
     $params = array_merge([
-        'user_id' => $userId,
+        'user_uid' => $userId,
         'action' => $action,
         'timestamp' => time()
     ], $actionData);
@@ -310,7 +310,7 @@ function verifyActionSignature(string $userId, string $action, array $actionData
     $secretKey = 'action-secret-key-' . $userId;
 
     $params = array_merge([
-        'user_id' => $userId,
+        'user_uid' => $userId,
         'action' => $action,
         'timestamp' => $actionData['timestamp'] ?? time()
     ], $actionData);

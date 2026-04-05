@@ -450,7 +450,7 @@ class OrderRepository
 
         // $orders = DB::connection($shard['db'])
         //            ->table($tableName)
-        //            ->where('user_id', $userId)
+        //            ->where('user_uid', $userId)
         //            ->get();
 
         return [];
@@ -474,7 +474,7 @@ class OrderRepository
         //   ->table($tableName)
         //   ->insert([
         //       'id' => $orderId,
-        //       'user_id' => $userId,
+        //       'user_uid' => $userId,
         //       ...$orderData
         //   ]);
 
@@ -531,7 +531,7 @@ class FeedRepository
         //   ->table($tableName)
         //   ->insert([
         //       'id' => $feedId,
-        //       'user_id' => $userId,
+        //       'user_uid' => $userId,
         //       'content' => $content,
         //   ]);
 
@@ -553,7 +553,7 @@ class FeedRepository
 
         // $feeds = DB::connection($shard['db'])
         //           ->table($tableName)
-        //           ->where('user_id', $userId)
+        //           ->where('user_uid', $userId)
         //           ->orderBy('id', 'desc')
         //           ->get();
 

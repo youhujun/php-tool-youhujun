@@ -291,7 +291,7 @@ $privateKey = 'YOUR_PRIVATE_KEY';
 
 // 准备请求数据
 $requestData = [
-    'user_id' => 12345,
+    'user_uid' => 12345,
     'username' => 'testuser',
     'timestamp' => time()
 ];
