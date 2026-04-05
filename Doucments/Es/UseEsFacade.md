@@ -100,7 +100,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 if (EsFacade::indexExists($indexName)) {
     echo "索引存在";
@@ -150,7 +150,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 // 创建带完整配置的索引
 $result = EsFacade::createIndex($indexName, [
@@ -252,7 +252,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 $result = EsFacade::deleteIndex($indexName);
 
@@ -305,7 +305,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 // 新增单个字段
 $newFields = [
@@ -381,7 +381,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 // 查询用户数据
 $userObject = ShardHelperFacade::queryAllShards(
@@ -461,7 +461,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 $userObject = ShardHelperFacade::queryAllShards(
     User::class,
@@ -523,7 +523,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 $userObject = ShardHelperFacade::queryAllShards(
     User::class,
@@ -600,7 +600,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 $userObject = ShardHelperFacade::queryAllShards(
     User::class,
@@ -667,7 +667,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 // 精确匹配搜索
 $query = [
@@ -730,7 +730,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 $query = [
     'match' => ['account_name' => 'develop']
@@ -788,7 +788,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 // 查询用户数据集合
 $userCollection = ShardHelperFacade::queryAllShards(
@@ -861,7 +861,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 $userCollection = ShardHelperFacade::queryAllShards(
     User::class,
@@ -946,7 +946,7 @@ EsFacade::init(
     config('common_es.password')
 );
 
-$indexName = config('common_es.indices.users');
+$indexName = config('common_es.indices.user.users');
 
 // 2. 检查索引是否存在
 if (!EsFacade::indexExists($indexName)) {
@@ -1023,7 +1023,7 @@ function syncUsersToEs()
         config('common_es.password')
     );
     
-    $indexName = config('common_es.indices.users');
+    $indexName = config('common_es.indices.user.users');
     
     // 查询需要同步的用户
     $userCollection = ShardHelperFacade::queryAllShards(
@@ -1087,7 +1087,7 @@ function cleanInvalidUsersFromEs()
         config('common_es.password')
     );
     
-    $indexName = config('common_es.indices.users');
+    $indexName = config('common_es.indices.user.users');
     
     // 方式1: 按条件批量删除
     $deleteQuery = [
