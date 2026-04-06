@@ -1,4 +1,14 @@
 <?php
+/*
+ * @Description: 
+ * @version: v1
+ * @Author: youhujun youhu8888@163.com & xueer 
+ * @Date: 2026-01-23 13:23:33
+ * @LastEditors: youhujun youhu8888@163.com & xueer
+ * @LastEditTime: 2026-04-06 12:54:45
+ * @FilePath: \youhu-laravel-api-12d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\App\Services\V1\Utils\Shard\ShardFacadeService.php
+ * Copyright (C) 2026 youhujun & xueer . All rights reserved.
+ */
 namespace YouHuJun\Tool\App\Services\V1\Utils\Shard;
 
 use YouHuJun\Tool\App\Exceptions\CommonException;
@@ -57,15 +67,20 @@ class ShardFacadeService
         $tableCount = $config['table_count'];
         $dbPrefix = $config['db_prefix'];
 
-        $dbNo = $uidValue % $dbCount;
-        $tableNo = $uidValue % $tableCount;
-        $shardKey = $tableNo;
+		// 总分片
+        $totalShardNumber = $dbCount * $tableCount; 
+		// 分片键
+		$shardKey   = $uidValue % $totalShardNumber; 
+		// 库序号
+		$dbNo       = intdiv($shardKey, $tableCount); 
+		// 表序号
+		$tableNo    = $shardKey % $tableCount; 
 
-        return [
-            'db' => $dbPrefix . $dbNo,
-            'table_no' => $tableNo,
-            'shard_key' => $shardKey
-        ];
+		return [
+			'db'        => $dbPrefix . $dbNo,
+			'table_no'  => $tableNo,
+			'shard_key' => $shardKey,
+		];
     }
 
     /**
