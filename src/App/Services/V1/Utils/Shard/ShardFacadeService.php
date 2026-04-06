@@ -1,18 +1,31 @@
 <?php
+
 /*
- * @Description: 
+ * @Description:
  * @version: v1
- * @Author: youhujun youhu8888@163.com & xueer 
+ * @Author: youhujun youhu8888@163.com & xueer
  * @Date: 2026-01-23 13:23:33
  * @LastEditors: youhujun youhu8888@163.com & xueer
  * @LastEditTime: 2026-04-06 12:54:45
  * @FilePath: \youhu-laravel-api-12d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\App\Services\V1\Utils\Shard\ShardFacadeService.php
  * Copyright (C) 2026 youhujun & xueer . All rights reserved.
  */
+
 namespace YouHuJun\Tool\App\Services\V1\Utils\Shard;
 
 use YouHuJun\Tool\App\Exceptions\CommonException;
 
+/**
+ * 分库分表规则：
+    总分片数 = 库数 × 表数
+    shard_key = uid % 总分片数
+    库号 = intdiv (shard_key, 表数)
+    表号 = shard_key % 表数
+
+    直接用库里存好的 shard_key
+    用 intdiv(shard_key, tableCount) 算库
+    用 shard_key % tableCount 算表
+ */
 class ShardFacadeService
 {
     /**
@@ -67,20 +80,20 @@ class ShardFacadeService
         $tableCount = $config['table_count'];
         $dbPrefix = $config['db_prefix'];
 
-		// 总分片
-        $totalShardNumber = $dbCount * $tableCount; 
-		// 分片键
-		$shardKey   = $uidValue % $totalShardNumber; 
-		// 库序号
-		$dbNo       = intdiv($shardKey, $tableCount); 
-		// 表序号
-		$tableNo    = $shardKey % $tableCount; 
+        // 总分片
+        $totalShardNumber = $dbCount * $tableCount;
+        // 分片键
+        $shardKey   = $uidValue % $totalShardNumber;
+        // 库序号
+        $dbNo       = intdiv($shardKey, $tableCount);
+        // 表序号
+        $tableNo    = $shardKey % $tableCount;
 
-		return [
-			'db'        => $dbPrefix . $dbNo,
-			'table_no'  => $tableNo,
-			'shard_key' => $shardKey,
-		];
+        return [
+            'db'        => $dbPrefix . $dbNo,
+            'table_no'  => $tableNo,
+            'shard_key' => $shardKey,
+        ];
     }
 
     /**
@@ -103,5 +116,4 @@ class ShardFacadeService
         $calc = $this->calc($uid, $configKey);
         return $calc['shard_key'];
     }
-
 }
