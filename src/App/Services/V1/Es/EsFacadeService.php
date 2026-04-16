@@ -90,7 +90,7 @@ class EsFacadeService
         $this->validateIndexName($index);
 
         $url = "{$this->esHost}/{$index}";
-        $response =http_head($url, $this->headers);
+        $response = http_head($url, $this->headers);
 
         //成功
         //HTTP/1.1 200 OKX-elastic-product: Elasticsearchcontent-type: application/json; charset=UTF-8content-length: 1057
@@ -793,7 +793,7 @@ class EsFacadeService
         $result = ['code' => 10000,'msg' => 'es文档批量删除','status' => 0,'error' => null];
 
 
-        $url = "{$this->esHost}/{$index}/_delete_by_query";
+        $url = "{$this->esHost}/{$index}/_delete_by_query?ignore_unavailable=true";
         $postData = ['query' => $query];
         $response = http_post($url, $this->headers, $postData);
 
