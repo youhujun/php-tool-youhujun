@@ -6,8 +6,8 @@
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-03-15 23:49:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-03-19 04:37:47
- * @FilePath: \youhu-laravel-api-12d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\App\Services\V1\Es\EsFacadeService.php
+ * @LastEditTime: 2026-04-22 03:21:05
+ * @FilePath: \youhu-laravel-api-12\vendor\youhujun\php-tool-youhujun\src\App\Services\V1\Es\EsFacadeService.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
 
@@ -123,7 +123,6 @@ class EsFacadeService
     public function createIndex(string $index, array $body = []): array
     {
         $this->validateIndexName($index);
-
 
         $result = ['code' => 10000,'msg' => 'es索引创建失败','status' => 0,'error' => null];
 
@@ -615,7 +614,7 @@ class EsFacadeService
 
         if (isset($jsonResultArray['result']) && $jsonResultArray['result'] == 'deleted') {
             $result['code'] = 0;
-            $result['msg'] = 'es文档无删除成功';
+            $result['msg'] = 'es文档删除成功';
             $result['status'] = 1; // 新增状态码：3=无操作
         }
 
@@ -769,7 +768,6 @@ class EsFacadeService
             $result['code'] = 0;
             $result['msg'] = 'es文档批量查询';
             $result['status'] = 1;
-            $result['data'] = $jsonResultArray;
         }
 
 
@@ -793,7 +791,7 @@ class EsFacadeService
         $result = ['code' => 10000,'msg' => 'es文档批量删除','status' => 0,'error' => null];
 
 
-        $url = "{$this->esHost}/{$index}/_delete_by_query?ignore_unavailable=true";
+        $url = "{$this->esHost}/{$index}/_delete_by_query?ignore_unavailable=true&conflicts=proceed";
         $postData = ['query' => $query];
         $response = http_post($url, $this->headers, $postData);
 
