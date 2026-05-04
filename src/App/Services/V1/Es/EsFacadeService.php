@@ -6,7 +6,7 @@
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-03-15 23:49:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-04-22 03:21:05
+ * @LastEditTime: 2026-05-04 15:42:14
  * @FilePath: \youhu-laravel-api-12\vendor\youhujun\php-tool-youhujun\src\App\Services\V1\Es\EsFacadeService.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
@@ -307,9 +307,10 @@ class EsFacadeService
      * @param string $index 索引名称
      * @param array $data 文档数据
      * @param string|null $docId 文档ID，为null时自动生成
+     * @param bool $refresh 默认开启强制刷新
      * @return array  $result 数组信息
      */
-    public function createDoc(string $index, array $data, string $docId = null): array
+    public function createDoc(string $index, array $data, string $docId = null,bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -318,11 +319,20 @@ class EsFacadeService
         // 拼接URL
         if ($docId) {
             // 指定ID创建（PUT）
-            $url = "{$this->esHost}/{$index}/_doc/{$docId}";
+            $url = "{$this->esHost}/{$index}/_doc/{$docId}?refresh=true";
+            if(!$refresh){
+                $url = "{$this->esHost}/{$index}/_doc/{$docId}";
+            }
+           
             $response = http_put($url, $this->headers, $data);
         } else {
             // 自动生成ID（POST）
-            $url = "{$this->esHost}/{$index}/_doc";
+            $url = "{$this->esHost}/{$index}/_doc?refresh=true";
+
+            if(!$refresh){
+               $url = "{$this->esHost}/{$index}/_doc";
+            }
+
             $response = http_post($url, $this->headers, $data);
         }
 
@@ -456,10 +466,11 @@ class EsFacadeService
      * @param string $docId 文档ID
      * @param array $data 更新数据（数组）
      * @param bool $isPartial 是否局部更新（true=局部，false=全量）
+     * @param bool $refresh 默认开启强制刷新
      * @return array 响应结果
      * @throws \Exception
      */
-    public function updateDoc(string $index, string $docId, array $data, bool $isPartial = true): array
+    public function updateDoc(string $index, string $docId, array $data, bool $isPartial = true,bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -467,11 +478,20 @@ class EsFacadeService
 
         if ($isPartial) {
             // 局部更新（ES推荐方式）
-            $url = "{$this->esHost}/{$index}/_update/{$docId}";
+            $url = "{$this->esHost}/{$index}/_update/{$docId}?refresh=true";
+
+            if(!$refresh){
+                $url = "{$this->esHost}/{$index}/_update/{$docId}";
+            }
+
             $postData = ['doc' => $data];
         } else {
             // 全量替换
-            $url = "{$this->esHost}/{$index}/_doc/{$docId}";
+            $url = "{$this->esHost}/{$index}/_doc/{$docId}?refresh=true";
+
+             if(!$refresh){
+                 $url = "{$this->esHost}/{$index}/_doc/{$docId}";
+             }
             $postData = $data;
         }
 
@@ -578,16 +598,22 @@ class EsFacadeService
      * 删除单个文档
      * @param string $index 索引名
      * @param string $docId 文档ID
+     * @param bool $refresh 默认开启强制刷新
      * @return array 响应结果
      * @throws \Exception
      */
-    public function deleteDoc(string $index, string $docId): array
+    public function deleteDoc(string $index, string $docId,bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
         $result = ['code' => 10000,'msg' => 'es文档删除','status' => 0,'error' => null];
 
-        $url = "{$this->esHost}/{$index}/_doc/{$docId}";
+        $url = "{$this->esHost}/{$index}/_doc/{$docId}?refresh=true";
+
+        if(!$refresh){
+            $url = "{$this->esHost}/{$index}/_doc/{$docId}";
+        }
+
         $response = http_delete($url, $this->headers);
         $jsonResultArray = $this->parseResponse($response);
 
@@ -780,10 +806,11 @@ class EsFacadeService
      * 按条件删除文档
      * @param string $index 索引名
      * @param array $query 删除条件
+     * @param bool $refresh 默认开启强制刷新
      * @return array 响应结果
      * @throws \Exception
      */
-    public function deleteByQuery(string $index, array $query): array
+    public function deleteByQuery(string $index, array $query,bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -791,7 +818,12 @@ class EsFacadeService
         $result = ['code' => 10000,'msg' => 'es文档批量删除','status' => 0,'error' => null];
 
 
-        $url = "{$this->esHost}/{$index}/_delete_by_query?ignore_unavailable=true&conflicts=proceed";
+        $url = "{$this->esHost}/{$index}/_delete_by_query?ignore_unavailable=true&conflicts=proceed&refresh=true";
+
+        if(!$refresh){
+            $url = "{$this->esHost}/{$index}/_delete_by_query?ignore_unavailable=true&conflicts=proceed";
+        }
+        
         $postData = ['query' => $query];
         $response = http_post($url, $this->headers, $postData);
 
@@ -867,9 +899,10 @@ class EsFacadeService
      *
      * @param string $index 索引名称
      * @param array $data 批量数据（每条含 _docId 字段）
+     * @param bool $refresh 默认开启强制刷新
      * @return array 统一格式的操作结果
      */
-    public function batchActDoc(string $index, array $data): array
+    public function batchActDoc(string $index, array $data,bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -885,7 +918,12 @@ class EsFacadeService
         }
 
         // 拼接bulk数据
-        $url = "{$this->esHost}/_bulk";
+        $url = "{$this->esHost}/_bulk?refresh=true";
+    
+        if(!$refresh){
+            $url = "{$this->esHost}/_bulk";
+        }
+
         $bulkData = '';
         foreach ($data as $item) {
             $id = $item['_docId'] ?? null;
@@ -914,12 +952,13 @@ class EsFacadeService
      *
      * @param string $index 索引名称
      * @param string|array $dataOrCondition 删除条件：
-     *                                     - 字符串：单个文档ID
-     *                                     - 数组（一维）：多个文档ID ['1','2','3']
-     *                                     - 数组（二维）：ES查询条件 ['match' => ['title' => '测试']]
+     *  - 字符串：单个文档ID
+     *  - 数组（一维）：多个文档ID ['1','2','3']
+     *  - 数组（二维）：ES查询条件 ['match' => ['title' => '测试']]
+     * @param bool $refresh 默认开启强制刷新
      * @return array 统一格式的操作结果
      */
-    public function batchDeleteDoc(string $index, string|array $dataOrCondition): array
+    public function batchDeleteDoc(string $index, string|array $dataOrCondition,bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -932,7 +971,13 @@ class EsFacadeService
         }
         // 2. 多个文档ID删除（一维数组）
         elseif (is_array($dataOrCondition) && isset($dataOrCondition[0]) && is_scalar($dataOrCondition[0])) {
-            $url = "{$this->esHost}/_bulk";
+
+            $url = "{$this->esHost}/_bulk?refresh=true";
+
+            if(!$refresh){
+                $url = "{$this->esHost}/_bulk";
+            }
+           
             $bulkData = '';
             foreach ($dataOrCondition as $docId) {
                 $bulkData .= json_encode(['delete' => ['_index' => $index, '_id' => $docId]]) . "\n";
@@ -981,13 +1026,27 @@ class EsFacadeService
      * @param string $method 请求方法（GET/POST/PUT/DELETE）
      * @param string $path 请求路径（如：/_cat/indices）
      * @param array $data 请求数据（可选）
+     * @param bool $refresh 默认开启强制刷新
      * @return array 响应结果
      * @throws \Exception
      */
-    public function customRequest(string $method, string $path, array $data = []): array
+    public function customRequest(string $method, string $path, array $data = [],bool $refresh = true): array
     {
         $method = strtoupper($method);
-        $url = "{$this->esHost}/" . ltrim($path, '/');
+        // 先拼接基础路径
+        $baseUrl = "{$this->esHost}/" . ltrim($path, '/');
+
+        if ($refresh) {
+            // 判断路径是否已有 ? 参数
+            if (str_contains($baseUrl, '?')) {
+                $url = $baseUrl . '&refresh=true';
+            } else {
+                $url = $baseUrl . '?refresh=true';
+            }
+        } else {
+            $url = $baseUrl;
+        }
+       
 
         switch ($method) {
             case 'GET':

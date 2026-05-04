@@ -6,8 +6,8 @@
  * @Author: youhujun youhu8888@163.com & xueer
  * @Date: 2026-03-15 23:49:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-03-19 04:34:18
- * @FilePath: \youhu-laravel-api-12d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\App\Facades\V1\Es\EsFacade.php
+ * @LastEditTime: 2026-05-04 15:48:59
+ * @FilePath: \youhu-laravel-api-12\vendor\youhujun\php-tool-youhujun\src\App\Facades\V1\Es\EsFacade.php
  * Copyright (C) 2026 youhujun & xueer. All rights reserved.
  */
 
@@ -123,10 +123,11 @@ class EsFacade
      * @param string $index 索引名称
      * @param array $data 文档数据
      * @param string|null $docId 文档ID，为null时自动生成
+     * @param bool $refresh 默认开启强制刷新
      * @return array 返回数组信息 ['code'=>0,'msg'=>'成功','status'=>1,'error'=>...]
      * @see EsFacadeService::createDoc()
      */
-    public static function createDoc(string $index, array $data, ?string $docId = null): array
+    public static function createDoc(string $index, array $data, ?string $docId = null,bool $refresh = true): array
     {
         return self::getInstance()->createDoc($index, $data, $docId);
     }
@@ -151,10 +152,11 @@ class EsFacade
      * @param string $docId 文档ID
      * @param array $data 更新数据（数组）
      * @param bool $isPartial 是否局部更新（true=局部，false=全量）
+     * @param bool $refresh 默认开启强制刷新
      * @return array 返回数组信息 ['code'=>0,'msg'=>'成功','status'=>1,'data'=>[...],'error'=>...]
      * @see EsFacadeService::updateDoc()
      */
-    public static function updateDoc(string $index, string $docId, array $data, bool $isPartial = true): array
+    public static function updateDoc(string $index, string $docId, array $data, bool $isPartial = true,bool $refresh = true): array
     {
         return self::getInstance()->updateDoc($index, $docId, $data, $isPartial);
     }
@@ -164,10 +166,11 @@ class EsFacade
      *
      * @param string $index 索引名
      * @param string $docId 文档ID
+     *  @param bool $refresh 默认开启强制刷新
      * @return array 返回数组信息 ['code'=>0,'msg'=>'成功','status'=>1,'error'=>...]
      * @see EsFacadeService::deleteDoc()
      */
-    public static function deleteDoc(string $index, string $docId): array
+    public static function deleteDoc(string $index, string $docId,bool $refresh = true): array
     {
         return self::getInstance()->deleteDoc($index, $docId);
     }
@@ -193,9 +196,10 @@ class EsFacade
      * @param string $index 索引名
      * @param array $query 删除条件
      * @return array 返回数组信息 ['code'=>0,'msg'=>'成功','status'=>1,'error'=>...]
+     * @param bool $refresh 默认开启强制刷新
      * @see EsFacadeService::deleteByQuery()
      */
-    public static function deleteByQuery(string $index, array $query): array
+    public static function deleteByQuery(string $index, array $query,bool $refresh = true): array
     {
         return self::getInstance()->deleteByQuery($index, $query);
     }
@@ -206,9 +210,10 @@ class EsFacade
      * @param string $index 索引名称
      * @param array $data 批量数据（每条含 _docId 字段）
      * @return array 统一格式的操作结果 ['code'=>0,'msg'=>'成功','status'=>1,'error'=>...]
+     * @param bool $refresh 默认开启强制刷新
      * @see EsFacadeService::batchActDoc()
      */
-    public static function batchActDoc(string $index, array $data): array
+    public static function batchActDoc(string $index, array $data,bool $refresh = true): array
     {
         return self::getInstance()->batchActDoc($index, $data);
     }
@@ -222,9 +227,10 @@ class EsFacade
      *                                     - 数组（一维）：多个文档ID ['1','2','3']
      *                                     - 数组（二维）：ES查询条件 ['match' => ['title' => '测试']]
      * @return array 统一格式的操作结果 ['code'=>0,'msg'=>'成功','status'=>1,'error'=>...]
+     * @param bool $refresh 默认开启强制刷新
      * @see EsFacadeService::batchDeleteDoc()
      */
-    public static function batchDeleteDoc(string $index, string|array $dataOrCondition): array
+    public static function batchDeleteDoc(string $index, string|array $dataOrCondition,bool $refresh = true): array
     {
         return self::getInstance()->batchDeleteDoc($index, $dataOrCondition);
     }
@@ -235,10 +241,11 @@ class EsFacade
      * @param string $method 请求方法（GET/POST/PUT/DELETE）
      * @param string $path 请求路径（如：/_cat/indices）
      * @param array $data 请求数据（可选）
+     * @param bool $refresh 默认开启强制刷新
      * @return array 响应结果
      * @see EsFacadeService::customRequest()
      */
-    public static function customRequest(string $method, string $path, array $data = []): array
+    public static function customRequest(string $method, string $path, array $data = [],bool $refresh = true): array
     {
         return self::getInstance()->customRequest($method, $path, $data);
     }
