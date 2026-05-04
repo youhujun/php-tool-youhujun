@@ -6,7 +6,7 @@
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-03-15 23:49:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-05-04 17:27:29
+ * @LastEditTime: 2026-05-04 17:41:26
  * @FilePath: \youhu-laravel-api-12\vendor\youhujun\php-tool-youhujun\src\App\Services\V1\Es\EsFacadeService.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
@@ -1036,10 +1036,9 @@ class EsFacadeService
         // 先拼接基础路径
         $baseUrl = "{$this->esHost}/" . ltrim($path, '/');
 
-        $getUrl = $baseUrl;
-
-        if ($refresh) {
-            // 判断路径是否已有 ? 参数
+        $isSearch = str_contains($path, '_search');
+    
+        if ($refresh && !$isSearch) {
             if (str_contains($baseUrl, '?')) {
                 $url = $baseUrl . '&refresh=true';
             } else {
@@ -1052,7 +1051,7 @@ class EsFacadeService
 
         switch ($method) {
             case 'GET':
-                $response = http_get($getUrl, $this->headers);
+                $response = http_get($url, $this->headers);
                 break;
             case 'POST':
                 $response = http_post($url, $this->headers, $data);
