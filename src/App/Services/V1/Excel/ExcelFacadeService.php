@@ -217,11 +217,9 @@ class ExcelFacadeService
 			$dir = dirname($savePath); // dirname('a/b/c') 会返回 'a/b'
 
 			// 检查并创建目录
-			if (!is_dir($savePath)) {
-				if (!mkdir($savePath, 0777, true) && !is_dir($savePath)) {
-					throw new CommonException("FailedCreateDirectory");
-				}
-			}
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
+            }
 
 			$finalFilePath = rtrim($savePath, '/\\') . DIRECTORY_SEPARATOR . $title . '.xlsx';
 			$writer->save($finalFilePath);
