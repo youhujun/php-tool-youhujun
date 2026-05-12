@@ -6,7 +6,7 @@
  * @Author: youhujun youhu8888@163.com & xueer
  * @Date: 2026-03-15 23:49:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-05-04 15:48:59
+ * @LastEditTime: 2026-05-10 23:26:33
  * @FilePath: \youhu-laravel-api-12\vendor\youhujun\php-tool-youhujun\src\App\Facades\V1\Es\EsFacade.php
  * Copyright (C) 2026 youhujun & xueer. All rights reserved.
  */
@@ -14,7 +14,6 @@
 namespace YouHuJun\Tool\App\Facades\V1\Es;
 
 use YouHuJun\Tool\App\Services\V1\Es\EsFacadeService;
-use YouHuJun\Tool\App\Services\V1\Es\Contracts\EsDataSyncContract;
 use BadMethodCallException;
 
 /**

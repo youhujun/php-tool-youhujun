@@ -6,7 +6,7 @@
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-03-15 23:49:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-05-04 17:41:26
+ * @LastEditTime: 2026-05-10 23:12:13
  * @FilePath: \youhu-laravel-api-12\vendor\youhujun\php-tool-youhujun\src\App\Services\V1\Es\EsFacadeService.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
@@ -1037,8 +1037,9 @@ class EsFacadeService
         $baseUrl = "{$this->esHost}/" . ltrim($path, '/');
 
         $isSearch = str_contains($path, '_search');
+        $isCount = str_contains($path, '_count');
     
-        if ($refresh && !$isSearch) {
+        if ($refresh && !$isSearch && !$isCount) {
             if (str_contains($baseUrl, '?')) {
                 $url = $baseUrl . '&refresh=true';
             } else {
