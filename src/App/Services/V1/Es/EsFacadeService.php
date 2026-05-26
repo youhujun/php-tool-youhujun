@@ -92,6 +92,8 @@ class EsFacadeService
         $url = "{$this->esHost}/{$index}";
         $response = http_head($url, $this->headers);
 
+
+
         //成功
         //HTTP/1.1 200 OKX-elastic-product: Elasticsearchcontent-type: application/json; charset=UTF-8content-length: 1057
         //失败
@@ -310,7 +312,7 @@ class EsFacadeService
      * @param bool $refresh 默认开启强制刷新
      * @return array  $result 数组信息
      */
-    public function createDoc(string $index, array $data, string $docId = null,bool $refresh = true): array
+    public function createDoc(string $index, array $data, string $docId = null, bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -320,17 +322,17 @@ class EsFacadeService
         if ($docId) {
             // 指定ID创建（PUT）
             $url = "{$this->esHost}/{$index}/_doc/{$docId}?refresh=true";
-            if(!$refresh){
+            if (!$refresh) {
                 $url = "{$this->esHost}/{$index}/_doc/{$docId}";
             }
-           
+
             $response = http_put($url, $this->headers, $data);
         } else {
             // 自动生成ID（POST）
             $url = "{$this->esHost}/{$index}/_doc?refresh=true";
 
-            if(!$refresh){
-               $url = "{$this->esHost}/{$index}/_doc";
+            if (!$refresh) {
+                $url = "{$this->esHost}/{$index}/_doc";
             }
 
             $response = http_post($url, $this->headers, $data);
@@ -470,7 +472,7 @@ class EsFacadeService
      * @return array 响应结果
      * @throws \Exception
      */
-    public function updateDoc(string $index, string $docId, array $data, bool $isPartial = true,bool $refresh = true): array
+    public function updateDoc(string $index, string $docId, array $data, bool $isPartial = true, bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -480,7 +482,7 @@ class EsFacadeService
             // 局部更新（ES推荐方式）
             $url = "{$this->esHost}/{$index}/_update/{$docId}?refresh=true";
 
-            if(!$refresh){
+            if (!$refresh) {
                 $url = "{$this->esHost}/{$index}/_update/{$docId}";
             }
 
@@ -489,9 +491,9 @@ class EsFacadeService
             // 全量替换
             $url = "{$this->esHost}/{$index}/_doc/{$docId}?refresh=true";
 
-             if(!$refresh){
-                 $url = "{$this->esHost}/{$index}/_doc/{$docId}";
-             }
+            if (!$refresh) {
+                $url = "{$this->esHost}/{$index}/_doc/{$docId}";
+            }
             $postData = $data;
         }
 
@@ -602,7 +604,7 @@ class EsFacadeService
      * @return array 响应结果
      * @throws \Exception
      */
-    public function deleteDoc(string $index, string $docId,bool $refresh = true): array
+    public function deleteDoc(string $index, string $docId, bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -610,7 +612,7 @@ class EsFacadeService
 
         $url = "{$this->esHost}/{$index}/_doc/{$docId}?refresh=true";
 
-        if(!$refresh){
+        if (!$refresh) {
             $url = "{$this->esHost}/{$index}/_doc/{$docId}";
         }
 
@@ -810,7 +812,7 @@ class EsFacadeService
      * @return array 响应结果
      * @throws \Exception
      */
-    public function deleteByQuery(string $index, array $query,bool $refresh = true): array
+    public function deleteByQuery(string $index, array $query, bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -820,10 +822,10 @@ class EsFacadeService
 
         $url = "{$this->esHost}/{$index}/_delete_by_query?ignore_unavailable=true&conflicts=proceed&refresh=true";
 
-        if(!$refresh){
+        if (!$refresh) {
             $url = "{$this->esHost}/{$index}/_delete_by_query?ignore_unavailable=true&conflicts=proceed";
         }
-        
+
         $postData = ['query' => $query];
         $response = http_post($url, $this->headers, $postData);
 
@@ -902,7 +904,7 @@ class EsFacadeService
      * @param bool $refresh 默认开启强制刷新
      * @return array 统一格式的操作结果
      */
-    public function batchActDoc(string $index, array $data,bool $refresh = true): array
+    public function batchActDoc(string $index, array $data, bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -919,8 +921,8 @@ class EsFacadeService
 
         // 拼接bulk数据
         $url = "{$this->esHost}/_bulk?refresh=true";
-    
-        if(!$refresh){
+
+        if (!$refresh) {
             $url = "{$this->esHost}/_bulk";
         }
 
@@ -958,7 +960,7 @@ class EsFacadeService
      * @param bool $refresh 默认开启强制刷新
      * @return array 统一格式的操作结果
      */
-    public function batchDeleteDoc(string $index, string|array $dataOrCondition,bool $refresh = true): array
+    public function batchDeleteDoc(string $index, string|array $dataOrCondition, bool $refresh = true): array
     {
         $this->validateIndexName($index);
 
@@ -971,13 +973,12 @@ class EsFacadeService
         }
         // 2. 多个文档ID删除（一维数组）
         elseif (is_array($dataOrCondition) && isset($dataOrCondition[0]) && is_scalar($dataOrCondition[0])) {
-
             $url = "{$this->esHost}/_bulk?refresh=true";
 
-            if(!$refresh){
+            if (!$refresh) {
                 $url = "{$this->esHost}/_bulk";
             }
-           
+
             $bulkData = '';
             foreach ($dataOrCondition as $docId) {
                 $bulkData .= json_encode(['delete' => ['_index' => $index, '_id' => $docId]]) . "\n";
@@ -1030,7 +1031,7 @@ class EsFacadeService
      * @return array 响应结果
      * @throws \Exception
      */
-    public function customRequest(string $method, string $path, array $data = [],bool $refresh = true): array
+    public function customRequest(string $method, string $path, array $data = [], bool $refresh = true): array
     {
         $method = strtoupper($method);
         // 先拼接基础路径
@@ -1038,7 +1039,7 @@ class EsFacadeService
 
         $isSearch = str_contains($path, '_search');
         $isCount = str_contains($path, '_count');
-    
+
         if ($refresh && !$isSearch && !$isCount) {
             if (str_contains($baseUrl, '?')) {
                 $url = $baseUrl . '&refresh=true';
@@ -1048,7 +1049,7 @@ class EsFacadeService
         } else {
             $url = $baseUrl;
         }
-       
+
 
         switch ($method) {
             case 'GET':
