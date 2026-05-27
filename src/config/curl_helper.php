@@ -53,15 +53,6 @@ if (!function_exists('http_get')) {
 
 
 if (!function_exists('http_post')) {
-    /**
-     * CURL POST请求
-     *
-     * @param string $url 请求地址
-     * @param array $headers 请求头（可选）
-     * @param mixed $data POST数据（可选）
-     * @return string|false 请求结果（失败返回false）
-     * @throws Exception 请求异常抛出
-     */
     function http_post($url, $headers = [], $data = null)
     {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
@@ -75,7 +66,8 @@ if (!function_exists('http_post')) {
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_TIMEOUT => 10,
+            CURLOPT_TIMEOUT => 30,          // 改成30秒，不容易超时
+            CURLOPT_USERAGENT => 'PHP-curl',// 加UA，避免被拦截
         ]);
 
         // 设置请求头
@@ -86,9 +78,14 @@ if (!function_exists('http_post')) {
         // 设置POST数据
         if (!empty($data)) {
             curl_setopt($ch, CURLOPT_POST, 1);
-            // 如果是数组且包含json头，自动转JSON
-            if (is_array($data) && in_array('Content-Type:application/json', $headers)) {
-                $data = json_encode($data, JSON_UNESCAPED_UNICODE);
+            if (is_array($data)) {
+                // 如果headers里有json，才转json；否则用form格式
+                $hasJson = in_array('Content-Type:application/json', $headers);
+                if ($hasJson) {
+                    $data = json_encode($data, JSON_UNESCAPED_UNICODE);
+                } else {
+                    $data = http_build_query($data);
+                }
             }
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         }
