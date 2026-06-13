@@ -896,6 +896,62 @@ if ($result1['code'] === 0) {
 
 ---
 
+#### 3. 清空索引内全部文档 - `clearAllDoc`
+
+清空当前索引内全部文档，保留索引结构和 mapping 不变。内部通过 `deleteByQuery` + `match_all` 实现。
+
+##### 方法签名
+
+```php
+EsFacade::clearAllDoc(string $index, bool $refresh = true): array
+```
+
+##### 参数说明
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| index | string | 是 | 索引名称 |
+| refresh | bool | 否 | 强制刷新，默认true |
+
+##### 返回值
+
+```php
+[
+    'code' => 0,
+    'msg' => 'es文档批量删除成功',
+    'status' => 1,
+    'error' => [...]
+]
+```
+
+##### 使用示例
+
+```php
+use YouHuJun\Tool\App\Facades\V1\Es\EsFacade;
+
+EsFacade::init(
+    config('common_es.host'),
+    config('common_es.user'),
+    config('common_es.password')
+);
+
+$indexName = config('common_es.indices.user.users');
+
+// 清空索引内全部文档（索引结构保留）
+$result = EsFacade::clearAllDoc($indexName);
+
+if ($result['code'] === 0) {
+    echo "索引内文档已全部清空";
+}
+
+// 关闭强制刷新（批量清空后统一刷新性能更好）
+$result = EsFacade::clearAllDoc($indexName, false);
+```
+
+**⚠️ 注意：** 该操作不可逆，清空前请确认数据已备份！
+
+---
+
 ### 四、高级功能
 
 #### 1. 自定义请求 - `customRequest`

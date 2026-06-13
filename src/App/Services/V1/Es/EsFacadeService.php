@@ -6,8 +6,8 @@
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-03-15 23:49:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-05-10 23:12:13
- * @FilePath: \youhu-laravel-api-12\vendor\youhujun\php-tool-youhujun\src\App\Services\V1\Es\EsFacadeService.php
+ * @LastEditTime: 2026-06-13 11:24:51
+ * @FilePath: \youhu-laravel-api-13d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\App\Services\V1\Es\EsFacadeService.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
 
@@ -895,6 +895,20 @@ class EsFacadeService
 
         return $result;
     }
+
+	/**
+	 * 清空当前索引内全部文档（保留索引结构、mapping不变）
+	 * @param string $index 索引名称
+	 * @param bool $refresh 强制刷新
+	 * @return array
+	 */
+	public function clearAllDoc(string $index, bool $refresh = true): array
+	{
+		$allQuery = [
+			'match_all' => new \stdClass()
+		];
+		return $this->deleteByQuery($index, $allQuery, $refresh);
+	}
 
     /**
      * 批量写入/更新文档（直接调用ES _bulk API）

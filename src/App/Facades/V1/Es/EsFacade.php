@@ -218,6 +218,19 @@ class EsFacade
     }
 
     /**
+     * 清空当前索引内全部文档（保留索引结构、mapping不变）
+     *
+     * @param string $index 索引名称
+     * @param bool $refresh 强制刷新，默认true
+     * @return array 统一格式的操作结果 ['code'=>0,'msg'=>'成功','status'=>1,'error'=>...]
+     * @see EsFacadeService::clearAllDoc()
+     */
+    public static function clearAllDoc(string $index, bool $refresh = true): array
+    {
+        return self::getInstance()->clearAllDoc($index, $refresh);
+    }
+
+    /**
      * 批量删除文档（支持单ID/多ID/条件删除）
      *
      * @param string $index 索引名称
