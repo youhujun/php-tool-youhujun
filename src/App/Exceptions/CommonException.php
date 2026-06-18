@@ -22,7 +22,7 @@ class CommonException extends \Exception
      * 错误信息
      * @var string
      */
-    protected $message;
+    protected $errorMsg;
 
     /**
      * 错误码映射表
@@ -131,19 +131,19 @@ class CommonException extends \Exception
 
             if ($errorConfig) {
                 $this->code = $errorConfig['code'] ?? 0;
-                $this->message = $errorConfig['msg'] ?? '未知错误';
+                $this->errorMsg = $errorConfig['msg'] ?? '未知错误';
                 // 如果配置中有 error 字段,使用配置的,否则使用传入的 errorKey
                 $this->errorKey = $errorConfig['error'] ?? $errorKey;
             } else {
                 // 错误码不存在,使用默认值
                 $this->errorKey = 'CodeError';
-                $this->message = '错误码不存在';
+                $this->errorMsg = '错误码不存在';
                 $this->code = 10001;
             }
         } else {
             // 默认服务器异常
             $this->errorKey = 'ServerError';
-            $this->message = '服务器异常';
+            $this->errorMsg = '服务器异常';
             $this->code = 10000;
         }
 
@@ -171,7 +171,7 @@ class CommonException extends \Exception
         $response = [
             'code' => $this->code,
             'error' => $this->errorKey,
-            'msg' => $this->message
+            'msg' => $this->errorMsg
         ];
 
         // 对字符串进行UTF-8编码检查和转换
@@ -222,7 +222,7 @@ class CommonException extends \Exception
         return [
             'code' => $this->code,
             'error' => $this->errorKey,
-            'message' => $this->message,
+            'message' => $this->errorMsg,
             'file' => $this->getFile(),
             'line' => $this->getLine(),
         ];
