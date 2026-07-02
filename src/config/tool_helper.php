@@ -5,7 +5,7 @@
  * @Author: YouHuJun
  * @Date: 2020-02-20 11:25:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-03-15 14:51:34
+ * @LastEditTime: 2026-07-03 01:04:20
  */
 
 // 格式化打印函数
@@ -116,77 +116,9 @@ if (!function_exists('is_serialized')) {
 
 
 
-// 数组处理相关
-if (!function_exists('array_level')) {
-    /**
-     * 计算数组维度
-     *
-     * @param array $arr 待计算数组
-     * @return int 数组最大维度
-     */
-    function array_level(array $arr): int
-    {
-        $levels = [0];
-        total($arr, $levels);
-        return max($levels);
-    }
-}
 
-if (!function_exists('total')) {
-    /**
-     * 递归计算数组维度（辅助函数）
-     *
-     * @param mixed $arr 待检测数据
-     * @param array &$levels 存储维度的引用数组
-     * @param int $level 当前层级
-     * @return void
-     */
-    function total($arr, &$levels, $level = 0): void
-    {
-        if (is_array($arr)) {
-            $level++;
-            $levels[] = $level;
 
-            foreach ($arr as $v) {
-                total($v, $levels, $level);
-            }
-        }
-    }
-}
 
-if (!function_exists('to_array')) {
-    /**
-     * 将数组每个元素转为单元素数组
-     *
-     * @param mixed $array 输入数据（非数组直接返回）
-     * @return array 处理后的数组
-     */
-    function to_array($array): array
-    {
-        if (!is_array($array)) {
-            return []; // 非数组返回空数组，避免报错
-        }
 
-        foreach ($array as $k => &$v) {
-            $v = [$v];
-        }
-        unset($v); // 释放引用，避免后续变量污染
 
-        return $array;
-    }
-}
 
-// ID合法性检查
-if (!function_exists('check_id')) {
-    /**
-     * 检查ID是否为纯数字
-     *
-     * @param mixed $id 待检查ID
-     * @return int 有效ID返回自身，无效返回0
-     */
-    function check_id($id): int
-    {
-        // 简化正则 + 强制转整型，更严谨
-        return preg_match('/^\d+$/', (string)$id) ? (int)$id : 0;
-    }
-}

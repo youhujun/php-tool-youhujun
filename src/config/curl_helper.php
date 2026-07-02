@@ -1,17 +1,13 @@
 <?php
 
-
 // HTTP请求相关
+
+use YouHuJun\Tool\App\Attributes\Common\DocParams;
+
 if (!function_exists('http_get')) {
-    /**
-     * CURL GET请求
-     *
-     * @param string $url 请求地址
-     * @param array $headers 请求头（默认空数组）
-     * @return string|false 请求结果（失败返回false）
-     * @throws Exception 请求超时/失败抛出异常
-     */
-    function http_get($url, $headers = [])
+    
+	#[DocParams('CURL GET请求',['url'=>['type'=>'string','note'=>'请求地址'],'headers'=>['type'=>'array','note'=>'请求头参数，默认为空数组'],'return'=>['type'=>'string','note'=>'请求结果，失败返回false'],'throws'=>['type'=>'Exception','note'=>'请求超时/失败抛出异常']])]
+    function http_get( string $url, array $headers = [])
     {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new Exception('无效的URL地址');
@@ -53,7 +49,9 @@ if (!function_exists('http_get')) {
 
 
 if (!function_exists('http_post')) {
-    function http_post($url, $headers = [], $data = null)
+    
+	#[DocParams('CURL POST请求',['url'=>['type'=>'string','note'=>'请求地址'],'headers'=>['type'=>'array','note'=>'请求头参数，默认为空数组'],'data'=>['type'=>'mixed','note'=>'POST提交的数据，支持数组/JSON字符串/表单数据，默认为null'],'return'=>['type'=>'string','note'=>'请求结果，失败抛出异常'],'throws'=>['type'=>'Exception','note'=>'无效URL/请求失败抛出异常']])]
+    function http_post(string $url, array $headers = [], mixed $data = null)
     {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new Exception('无效的URL地址');
@@ -102,17 +100,10 @@ if (!function_exists('http_post')) {
     }
 }
 
-/**
- * CURL PUT 请求（适配 ES 更新操作）
- *
- * @param string $url 请求地址（如 ES 的文档更新接口）
- * @param array $headers 请求头数组（默认空）
- * @param mixed $data 提交的数据（数组/JSON 字符串）
- * @return string|false 请求结果（失败返回false）
- * @throws Exception 请求异常抛出
- */
 if (!function_exists('http_put')) {
-    function http_put($url, $headers = [], $data = null)
+    
+	#[DocParams('CURL PUT请求（适配ES更新操作）',['url'=>['type'=>'string','note'=>'请求地址（如ES的文档更新接口）'],'headers'=>['type'=>'array','note'=>'请求头数组，默认空'],'data'=>['type'=>'mixed','note'=>'提交的数据，支持数组/JSON字符串，默认为null'],'return'=>['type'=>'string','note'=>'请求结果，失败抛出异常'],'throws'=>['type'=>'Exception','note'=>'无效URL/请求失败抛出异常']])]
+    function http_put(string $url, array $headers = [], mixed $data = null)
     {
         // URL 合法性校验（和 POST/GET 保持一致）
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
@@ -158,17 +149,10 @@ if (!function_exists('http_put')) {
     }
 }
 
-/**
- * CURL DELETE 请求（适配 ES 删除操作）
- *
- * @param string $url 请求地址（如 ES 的文档删除接口）
- * @param array $headers 请求头数组（默认空）
- * @param mixed $data 提交的数据（可选，部分 ES 删除接口需要传参）
- * @return string|false 请求结果（失败返回false）
- * @throws Exception 请求异常抛出
- */
 if (!function_exists('http_delete')) {
-    function http_delete($url, $headers = [], $data = null)
+    
+	#[DocParams('CURL DELETE请求（适配ES删除操作）',['url'=>['type'=>'string','note'=>'请求地址（如ES的文档删除接口）'],'headers'=>['type'=>'array','note'=>'请求头数组，默认空'],'data'=>['type'=>'mixed','note'=>'提交的数据，部分ES删除接口需要传参，默认为null'],'return'=>['type'=>'string','note'=>'请求结果，失败抛出异常'],'throws'=>['type'=>'Exception','note'=>'无效URL/请求失败抛出异常']])]
+    function http_delete(string $url, array $headers = [], mixed $data = null)
     {
         // URL 合法性校验
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
@@ -211,59 +195,52 @@ if (!function_exists('http_delete')) {
 
         return $res;
     }
+}
 
-
-    /**
-     * CURL HEAD 请求（适配 ES 索引存在性检查等场景）
-     *
-     * @param string $url 请求地址（如 ES 的索引检查接口）
-     * @param array $headers 请求头数组（默认空）
-     * @return string 请求结果（返回完整响应头，失败抛异常）
-     * @throws Exception 请求异常/无效URL抛出
-     */
-    if (!function_exists('http_head')) {
-        function http_head($url, $headers = [])
-        {
-            // 1. URL 合法性校验（和其他HTTP函数保持一致）
-            if (!filter_var($url, FILTER_VALIDATE_URL)) {
-                throw new Exception('无效的URL地址');
-            }
-
-            // 2. 初始化CURL并设置核心参数
-            $ch = curl_init();
-            curl_setopt_array($ch, [
-                CURLOPT_URL => $url,
-                CURLOPT_HEADER => 1, // 关键：返回响应头（HEAD请求核心需求）
-                CURLOPT_RETURNTRANSFER => 1, // 返回结果而非直接输出
-                CURLOPT_SSL_VERIFYPEER => false, // 兼容HTTPS（测试/生产按需调整）
-                CURLOPT_SSL_VERIFYHOST => false,
-                CURLOPT_TIMEOUT => 10, // 超时时间（和其他函数一致）
-                CURLOPT_FOLLOWLOCATION => true, // 跟随重定向（适配ES可能的重定向）
-                CURLOPT_NOBODY => true, // 关键：只返回头，不返回响应体（HEAD请求特性）
-                CURLOPT_CUSTOMREQUEST => 'HEAD', // 显式声明HEAD请求方法
-            ]);
-
-            // 3. 设置请求头（容错+和其他函数逻辑一致）
-            $headers = is_array($headers) ? $headers : [];
-            if (!empty($headers)) {
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            }
-
-            // 4. 执行请求并捕获错误
-            $res = curl_exec($ch);
-            $error = curl_error($ch);
-            $errno = curl_errno($ch); // 补充错误码，和httpGet保持一致的容错粒度
-            curl_close($ch);
-
-            // 5. 严格的错误判断（和httpGet保持一致）
-            if ($res === false) {
-                throw new Exception("HEAD请求执行失败：{$error}（错误码：{$errno}）");
-            }
-            if ($errno !== 0) {
-                throw new Exception("HEAD请求异常：{$error}（错误码：{$errno}）");
-            }
-
-            return $res;
+if (!function_exists('http_head')) {
+    
+    #[DocParams('CURL HEAD请求（适配ES索引存在性检查等场景）',['url'=>['type'=>'string','note'=>'请求地址（如ES的索引检查接口）'],'headers'=>['type'=>'array','note'=>'请求头数组，默认空'],'return'=>['type'=>'string','note'=>'请求结果，返回完整响应头，失败抛出异常'],'throws'=>['type'=>'Exception','note'=>'无效URL/请求失败抛出异常']])]
+    function http_head(string $url, array $headers = [])
+    {
+        // 1. URL 合法性校验（和其他HTTP函数保持一致）
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new Exception('无效的URL地址');
         }
+
+        // 2. 初始化CURL并设置核心参数
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_HEADER => 1, // 关键：返回响应头（HEAD请求核心需求）
+            CURLOPT_RETURNTRANSFER => 1, // 返回结果而非直接输出
+            CURLOPT_SSL_VERIFYPEER => false, // 兼容HTTPS（测试/生产按需调整）
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_TIMEOUT => 10, // 超时时间（和其他函数一致）
+            CURLOPT_FOLLOWLOCATION => true, // 跟随重定向（适配ES可能的重定向）
+            CURLOPT_NOBODY => true, // 关键：只返回头，不返回响应体（HEAD请求特性）
+            CURLOPT_CUSTOMREQUEST => 'HEAD', // 显式声明HEAD请求方法
+        ]);
+
+        // 3. 设置请求头（容错+和其他函数逻辑一致）
+        $headers = is_array($headers) ? $headers : [];
+        if (!empty($headers)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+
+        // 4. 执行请求并捕获错误
+        $res = curl_exec($ch);
+        $error = curl_error($ch);
+        $errno = curl_errno($ch); // 补充错误码，和httpGet保持一致的容错粒度
+        curl_close($ch);
+
+        // 5. 严格的错误判断（和httpGet保持一致）
+        if ($res === false) {
+            throw new Exception("HEAD请求执行失败：{$error}（错误码：{$errno}）");
+        }
+        if ($errno !== 0) {
+            throw new Exception("HEAD请求异常：{$error}（错误码：{$errno}）");
+        }
+
+        return $res;
     }
 }
