@@ -5,7 +5,7 @@
  * @Author: YouHuJun
  * @Date: 2020-02-20 11:25:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-07-03 01:04:20
+ * @LastEditTime: 2026-07-12 20:33:23
  */
 
 // 格式化打印函数
@@ -51,6 +51,27 @@ if (!function_exists('f')) {
         return htmlspecialchars((string)$param, ENT_QUOTES, 'UTF-8');
     }
 }
+
+if(!function_exists('maskString')){
+	 #[DocParams('脱敏字符串', ['dataString' => ['type' => 'string', 'note' => '待处理的字符串'],
+	 'prefixLen' => ['type' => 'int', 'note' => '前缀保留长度'], 'suffixLen' => ['type' => 'int', 'note' => '后缀保留长度'], 'return' => ['type' => 'string', 'note' => '脱敏后的字符串']])]
+	function maskString(string $dataString, int $prefixLen = 3, int $suffixLen = 4): string
+	{
+		// 指定UTF-8编码，按字符计算长度
+        $strLen = mb_strlen($dataString, 'UTF-8');
+        if ($strLen <= $prefixLen + $suffixLen) {
+            return $dataString;
+        }
+        $prefix = mb_substr($dataString, 0, $prefixLen, 'UTF-8');
+        $suffix = mb_substr($dataString, -$suffixLen, $suffixLen, 'UTF-8');
+        $star = str_repeat('*', $strLen - $prefixLen - $suffixLen);
+        
+        return $prefix . $star . $suffix;
+	
+	}
+
+}
+
 
 // 接口返回码合并
 if (!function_exists('code')) {
