@@ -5,7 +5,7 @@
  * @Author: YouHuJun
  * @Date: 2020-02-20 11:25:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-07-14 01:45:59
+ * @LastEditTime: 2026-07-14 05:15:34
  */
 use YouHuJun\Tool\App\Annotations\DocParams;
 
@@ -50,10 +50,10 @@ if (!function_exists('f')) {
     }
 }
 
-if(!function_exists('maskString')){
+if(!function_exists('mask_string')){
 	 #[DocParams('脱敏字符串', ['dataString' => ['type' => 'string', 'note' => '待处理的字符串'],
 	 'prefixLen' => ['type' => 'int', 'note' => '前缀保留长度'], 'suffixLen' => ['type' => 'int', 'note' => '后缀保留长度'], 'return' => ['type' => 'string', 'note' => '脱敏后的字符串']])]
-	function maskString(string $dataString, int $prefixLen = 3, int $suffixLen = 4): string
+	function mask_string(string $dataString, int $prefixLen = 3, int $suffixLen = 4): string
 	{
 		// 指定UTF-8编码，按字符计算长度
         $strLen = mb_strlen($dataString, 'UTF-8');
@@ -70,9 +70,9 @@ if(!function_exists('maskString')){
 
 }
 
-if (!function_exists('getNowDateTime')) {
+if (!function_exists('get_now_date_time')) {
 	#[DocParams('获取当前时间', ['return' => ['type' => 'string', 'note' => '当前时间']])]
-	function getNowDateTime(): string
+	function get_now_date_time(): string
 	{
 		return date('Y-m-d H:i:s');
 	}
