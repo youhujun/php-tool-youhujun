@@ -5,18 +5,14 @@
  * @Author: YouHuJun
  * @Date: 2020-02-20 11:25:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-07-12 20:33:23
+ * @LastEditTime: 2026-07-14 01:45:59
  */
+use YouHuJun\Tool\App\Annotations\DocParams;
 
-// 格式化打印函数
 if (!function_exists('p')) {
-    /**
-     * 打印函数（格式化输出，便于调试）
-     *
-     * @param mixed $param 要打印的参数，可以是任意类型
-     * @return void
-     */
-    function p($param): void
+    
+    #[DocParams('格式化打印变量，便于调试', ['param' => ['type' => 'mixed', 'note' => '要打印的参数，可以是任意类型'], 'return' => ['type' => 'void', 'note' => '无返回值']])]
+    function p(mixed $param): void
     {
         echo "<pre>";
         print_r($param);
@@ -26,15 +22,13 @@ if (!function_exists('p')) {
 
 // 过滤HTML标签/转义实体
 if (!function_exists('f')) {
-    /**
-     * 过滤字符串中的HTML标签/转义HTML实体
-     *
-     * @param mixed $param 输入的字符串或数组
-     * @param int $type 过滤类型：0=转义实体（默认），1=去除标签
-     * @return mixed 过滤后的字符串/数组
-     */
-    function f($param, $type = 0)
+   
+    #[DocParams('过滤HTML标签或转义HTML实体，支持数组递归处理', ['param' => ['type' => 'mixed', 'note' => '输入的字符串或数组'], 'type' => ['type' => 'int', 'note' => '过滤类型：0=转义实体(默认)，1=去除标签'], 'return' => ['type' => 'mixed', 'note' => '过滤后的数据']])]
+    function f(mixed $param, int $type = 0): mixed
     {
+        if (is_numeric($param)) {
+            return $param;
+        }
         // 数组递归处理（修复：原代码未赋值回数组）
         if (is_array($param)) {
             foreach ($param as $key => $value) {
@@ -43,12 +37,16 @@ if (!function_exists('f')) {
             return $param;
         }
 
-        // 非数组处理（简化逻辑）
-        if ($type === 1) {
-            return strip_tags((string)$param);
+        if (is_string($param)) {
+            // 非数组处理（简化逻辑）
+            if ($type === 1) {
+                return strip_tags((string)$param);
+            }
+
+            return htmlspecialchars((string)$param, ENT_QUOTES, 'UTF-8');
         }
 
-        return htmlspecialchars((string)$param, ENT_QUOTES, 'UTF-8');
+		return $param;
     }
 }
 
@@ -72,17 +70,19 @@ if(!function_exists('maskString')){
 
 }
 
+if (!function_exists('getNowDateTime')) {
+	#[DocParams('获取当前时间', ['return' => ['type' => 'string', 'note' => '当前时间']])]
+	function getNowDateTime(): string
+	{
+		return date('Y-m-d H:i:s');
+	}
+}
 
 // 接口返回码合并
 if (!function_exists('code')) {
-    /**
-     * 合并接口返回码和附加数据
-     *
-     * @param array|null $code 配置的返回码数组
-     * @param array|null $add 附加数据数组
-     * @return array 合并后的结果
-     */
-    function code($code = [], $add = [])
+   
+    #[DocParams('合并接口返回码和附加数据', ['code' => ['type' => 'array|null', 'note' => '配置的返回码数组'], 'add' => ['type' => 'array|null', 'note' => '附加数据数组'], 'return' => ['type' => 'array', 'note' => '合并后的结果数组']])]
+    function code(?array $code = null, ?array $add = null)
     {
         // 简化逻辑（原逻辑冗余）
         $code = $code ?? [];
@@ -92,15 +92,12 @@ if (!function_exists('code')) {
     }
 }
 
+
 // 检测序列化字符串
 if (!function_exists('is_serialized')) {
-    /**
-     * 检测字符串是否为PHP序列化格式
-     *
-     * @param mixed $data 待检测数据
-     * @return bool
-     */
-    function is_serialized($data)
+    
+    #[DocParams('检测字符串是否为PHP序列化格式', ['data' => ['type' => 'mixed', 'note' => '待检测数据'], 'return' => ['type' => 'bool', 'note' => '是否为序列化字符串']])]
+    function is_serialized(mixed $data):bool
     {
         // 非字符串直接返回false
         if (!is_string($data)) {
@@ -134,7 +131,6 @@ if (!function_exists('is_serialized')) {
         }
     }
 }
-
 
 
 
