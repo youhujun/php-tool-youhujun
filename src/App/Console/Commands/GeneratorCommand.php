@@ -172,7 +172,7 @@ class GeneratorCommand
                 $moduleNamespace,
                 $className,
                 $description ?: '自动生成的服务类',
-                date('Y-m-d H:i:s'),
+                get_now_date_time(),
                 date('Y'),
             ],
             $stub
