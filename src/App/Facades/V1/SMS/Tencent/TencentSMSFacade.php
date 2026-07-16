@@ -1,4 +1,14 @@
 <?php
+/*
+ * @Description: 
+ * @version: v1
+ * @Author: youhujun youhu8888@163.com & xueer 
+ * @Date: 2026-01-08 11:21:22
+ * @LastEditors: youhujun youhu8888@163.com & xueer
+ * @LastEditTime: 2026-07-15 15:43:17
+ * @FilePath: \youhu-laravel-api-13d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\App\Facades\V1\SMS\Tencent\TencentSMSFacade.php
+ * Copyright (C) 2026 youhujun & xueer . All rights reserved.
+ */
 namespace YouHuJun\Tool\App\Facades\V1\SMS\Tencent;
 
 use YouHuJun\Tool\App\Services\V1\SMS\Tencent\TencentSMSFacadeService;
@@ -11,7 +21,7 @@ use BadMethodCallException;
  */
 class TencentSMSFacade 
 {
-    protected static $instance;
+    protected static ?TencentSMSFacadeService $instance = null;
 
     private function __construct() {}
     private function __clone() {}
