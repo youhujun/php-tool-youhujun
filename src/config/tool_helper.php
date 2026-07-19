@@ -5,7 +5,7 @@
  * @Author: YouHuJun
  * @Date: 2020-02-20 11:25:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-07-14 05:15:34
+ * @LastEditTime: 2026-07-19 15:24:37
  */
 use YouHuJun\Tool\App\Annotations\DocParams;
 
@@ -75,6 +75,14 @@ if (!function_exists('get_now_date_time')) {
 	function get_now_date_time(): string
 	{
 		return date('Y-m-d H:i:s');
+	}
+}
+
+if (!function_exists('get_show_amount')) {
+	#[DocParams('获取显示金额', ['amount' => ['type' => 'int', 'note' => '待处理的金额'],'return' => ['type' => 'string', 'note' => '当前时间']])]
+	function get_show_amount(int $amount): string
+	{
+		return bcdiv((string)$amount,'100', 2);
 	}
 }
 
