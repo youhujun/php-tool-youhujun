@@ -5,7 +5,7 @@
  * @Author: YouHuJun
  * @Date: 2020-02-20 11:25:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-07-19 15:24:37
+ * @LastEditTime: 2026-07-26 22:06:18
  */
 use YouHuJun\Tool\App\Annotations\DocParams;
 
@@ -84,6 +84,23 @@ if (!function_exists('get_show_amount')) {
 	{
 		return bcdiv((string)$amount,'100', 2);
 	}
+}
+
+//抓换cascader数组为一维数组
+if (!function_exists('get_cascader_array')) {
+   
+    #[DocParams('将级联数组转换为一维去重数组', ['cascader_id_array' => ['type' => 'array', 'note' => '级联二维数组'], 'return' => ['type' => 'array', 'note' => '去重后的一维数组']])]
+    function get_cascader_array(array $cascader_id_array = []):array
+    {
+        $id_array = array_reduce($cascader_id_array,function ($carry, $item) {
+           foreach ($item as $value) {
+                $carry[] = $value;
+            }
+            return $carry;
+        },[]);
+
+		return array_unique($id_array);
+    }
 }
 
 // 接口返回码合并
