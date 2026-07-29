@@ -156,7 +156,7 @@ class ExcelFacade
      *
      * @see \YouHuJun\Tool\App\Services\V1\Excel\ExcelFacadeService::getRowData()
      */
-    public static function getRowData(int $rowIndex = 1): array
+    public static function getRowData(int $rowIndex = 1)
     {
         return static::getInstance()->getRowData($rowIndex);
     }
@@ -169,7 +169,7 @@ class ExcelFacade
      *
      * @see \YouHuJun\Tool\App\Services\V1\Excel\ExcelFacadeService::getColumnData()
      */
-    public static function getColumnData(int $columnIndex): array
+    public static function getColumnData(int $columnIndex)
     {
         return static::getInstance()->getColumnData($columnIndex);
     }

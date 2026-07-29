@@ -123,29 +123,37 @@ class CommonException extends \Exception
      * @param string|null $errorKey 错误标识
      * @param \Throwable|null $previous 先前的异常
      */
-    public function __construct(string|null $errorKey = null, \Throwable|null $previous = null)
+    public function __construct(string|null|array $errorKey = null, \Throwable|null $previous = null)
     {
-        if ($errorKey) {
-            $this->errorKey = $errorKey;
-            $errorConfig = $this->getErrorConfig($errorKey);
+		if(is_array($errorKey)){
+			$this->errorKey = $errorKey['error'] ?? 'CodeError';
+			$this->errorMsg = $errorKey['msg'] ?? '服务器异常';
+			$this->code = $errorKey['code'] ?? 10000;
+		}else{
+			 if ($errorKey) {
+				$this->errorKey = $errorKey;
+				$errorConfig = $this->getErrorConfig($errorKey);
 
-            if ($errorConfig) {
-                $this->code = $errorConfig['code'] ?? 0;
-                $this->errorMsg = $errorConfig['msg'] ?? '未知错误';
-                // 如果配置中有 error 字段,使用配置的,否则使用传入的 errorKey
-                $this->errorKey = $errorConfig['error'] ?? $errorKey;
-            } else {
-                // 错误码不存在,使用默认值
-                $this->errorKey = 'CodeError';
-                $this->errorMsg = '错误码不存在';
-                $this->code = 10001;
-            }
-        } else {
-            // 默认服务器异常
-            $this->errorKey = 'ServerError';
-            $this->errorMsg = '服务器异常';
-            $this->code = 10000;
-        }
+				if ($errorConfig) {
+					$this->code = $errorConfig['code'] ?? 0;
+					$this->errorMsg = $errorConfig['msg'] ?? '未知错误';
+					// 如果配置中有 error 字段,使用配置的,否则使用传入的 errorKey
+					$this->errorKey = $errorConfig['error'] ?? $errorKey;
+				} else {
+					// 错误码不存在,使用默认值
+					$this->errorKey = 'CodeError';
+					$this->errorMsg = '错误码不存在';
+					$this->code = 10001;
+				}
+			} else {
+				// 默认服务器异常
+				$this->errorKey = 'ServerError';
+				$this->errorMsg = '服务器异常';
+				$this->code = 10000;
+			}
+
+		}
+       
 
         parent::__construct($this->message, $this->code, $previous);
     }

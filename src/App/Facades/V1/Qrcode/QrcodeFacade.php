@@ -1,16 +1,34 @@
 <?php
+/*
+ * @Description: 
+ * @version: v1
+ * @Author: youhujun youhu8888@163.com & xueer 
+ * @Date: 2026-01-08 11:33:50
+ * @LastEditors: youhujun youhu8888@163.com & xueer
+ * @LastEditTime: 2026-07-30 04:06:14
+ * @FilePath: \youhu-laravel-api-13d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\App\Facades\V1\Qrcode\QrcodeFacade.php
+ * Copyright (C) 2026 youhujun & xueer . All rights reserved.
+ */
 namespace YouHuJun\Tool\App\Facades\V1\Qrcode;
 
 use YouHuJun\Tool\App\Services\V1\Qrcode\QrcodeFacadeService;
 use BadMethodCallException;
+
+use YouHuJun\Tool\App\Attributes\Common\DocNote;
+use YouHuJun\Tool\App\Attributes\Common\DocParams;
 
 /**
  * 二维码门面类
  *
  * @see \YouHuJun\Tool\App\Services\V1\Qrcode\QrcodeFacadeService
  */
+#[DocNote('二维码门面类')]
 class QrcodeFacade 
 {
+	 /**
+     * 单例实例
+     * @var QrcodeFacadeService|null
+     */
     protected static $instance;
 
     private function __construct() {}
@@ -50,15 +68,11 @@ class QrcodeFacade
         return static::$instance;
     }
 
-    /**
-     * 生成二维码
-     *
-     * @param array $config 配置参数
-     * @param array $params 二维码参数
-     * @param int $mode 输出模式: 1-保存到文件, 2-直接输出, 3-生成Data URI
-     * @return mixed 根据mode不同返回不同结果
-     * @throws \YouHuJun\Tool\App\Exceptions\CommonException
-     */
+   #[DocParams(' 生成二维码', [
+		'config' => ['type' => 'array', 'note' => '配置参数'], 
+		'params' => ['type' => 'array', 'note' => '二维码参数'], 
+		'mode' => ['type' => 'int', 'note' => '输出模式: 1-保存到文件, 2-直接输出, 3-生成Data URI'], 
+		'return' => ['type' => 'mixed','note' => '根据mode不同返回不同结果']])]
     public static function makeQrcode(array $config, array $params, int $mode = 1)
     {
         return static::getInstance()->makeQrcode($config, $params, $mode);
