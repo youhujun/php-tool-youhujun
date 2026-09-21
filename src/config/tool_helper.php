@@ -5,69 +5,100 @@
  * @Author: YouHuJun
  * @Date: 2020-02-20 11:25:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-07-26 22:06:18
+ * @LastEditTime: 2026-08-09 10:39:18
  */
+
 use YouHuJun\Tool\App\Annotations\DocParams;
 
 if (!function_exists('p')) {
-    
-    #[DocParams('格式化打印变量，便于调试', ['param' => ['type' => 'mixed', 'note' => '要打印的参数，可以是任意类型'], 'return' => ['type' => 'void', 'note' => '无返回值']])]
-    function p(mixed $param): void
-    {
-        echo "<pre>";
-        print_r($param);
-        echo "</pre>";
-    }
+
+	#[DocParams('格式化打印变量，便于调试', ['param' => ['type' => 'mixed', 'note' => '要打印的参数，可以是任意类型'], 'return' => ['type' => 'void', 'note' => '无返回值']])]
+	function p(mixed $param): void
+	{
+		echo "<pre>";
+		print_r($param);
+		echo "</pre>";
+	}
 }
 
 // 过滤HTML标签/转义实体
 if (!function_exists('f')) {
-   
-    #[DocParams('过滤HTML标签或转义HTML实体，支持数组递归处理', ['param' => ['type' => 'mixed', 'note' => '输入的字符串或数组'], 'type' => ['type' => 'int', 'note' => '过滤类型：0=转义实体(默认)，1=去除标签'], 'return' => ['type' => 'mixed', 'note' => '过滤后的数据']])]
-    function f(mixed $param, int $type = 0): mixed
-    {
-        if (is_numeric($param)) {
-            return $param;
-        }
-        // 数组递归处理（修复：原代码未赋值回数组）
-        if (is_array($param)) {
-            foreach ($param as $key => $value) {
-                $param[$key] = f($value, $type);
-            }
-            return $param;
-        }
 
-        if (is_string($param)) {
-            // 非数组处理（简化逻辑）
-            if ($type === 1) {
-                return strip_tags((string)$param);
-            }
+	#[DocParams('过滤HTML标签或转义HTML实体，支持数组递归处理', ['param' => ['type' => 'mixed', 'note' => '输入的字符串或数组'], 'type' => ['type' => 'int', 'note' => '过滤类型：0=转义实体(默认)，1=去除标签'], 'return' => ['type' => 'mixed', 'note' => '过滤后的数据']])]
+	function f(mixed $param, int $type = 0): mixed
+	{
+		if (is_numeric($param)) {
+			return $param;
+		}
+		// 数组递归处理（修复：原代码未赋值回数组）
+		if (is_array($param)) {
+			foreach ($param as $key => $value) {
+				$param[$key] = f($value, $type);
+			}
+			return $param;
+		}
 
-            return htmlspecialchars((string)$param, ENT_QUOTES, 'UTF-8');
-        }
+		if (is_string($param)) {
+			// 非数组处理（简化逻辑）
+			if ($type === 1) {
+				return strip_tags((string)$param);
+			}
+
+			return htmlspecialchars((string)$param, ENT_QUOTES, 'UTF-8');
+		}
 
 		return $param;
-    }
+	}
 }
 
-if(!function_exists('mask_string')){
-	 #[DocParams('脱敏字符串', ['dataString' => ['type' => 'string', 'note' => '待处理的字符串'],
-	 'prefixLen' => ['type' => 'int', 'note' => '前缀保留长度'], 'suffixLen' => ['type' => 'int', 'note' => '后缀保留长度'], 'return' => ['type' => 'string', 'note' => '脱敏后的字符串']])]
+// 接口返回码合并
+if (!function_exists('code')) {
+
+	#[DocParams('合并接口返回码和附加数据', ['code' => ['type' => 'array|null', 'note' => '配置的返回码数组'], 'add' => ['type' => 'array|null', 'note' => '附加数据数组'], 'return' => ['type' => 'array', 'note' => '合并后的结果数组']])]
+	function code(?array $code = null, ?array $add = null)
+	{
+		// 简化逻辑（原逻辑冗余）
+		$code = $code ?? [];
+		$add = $add ?? [];
+
+		return array_merge($code, $add);
+	}
+}
+
+if (!function_exists('init_number_code')) {
+	#[DocParams('生成短信验证码', ['return' => ['type' => 'string', 'note' => '短信验证码']])]
+	function init_number_code(): string
+	{
+		$code = '';
+
+		for ($i = 0; $i < 4; $i++) {
+			$code .= \mt_rand(0, 9);
+		}
+
+		return $code;
+	}
+}
+
+if (!function_exists('mask_string')) {
+	#[DocParams('脱敏字符串', [
+		'dataString' => ['type' => 'string', 'note' => '待处理的字符串'],
+		'prefixLen' => ['type' => 'int', 'note' => '前缀保留长度'],
+		'suffixLen' => ['type' => 'int', 'note' => '后缀保留长度'],
+		'return' => ['type' => 'string', 'note' => '脱敏后的字符串']
+	])]
 	function mask_string(string $dataString, int $prefixLen = 3, int $suffixLen = 4): string
 	{
 		// 指定UTF-8编码，按字符计算长度
-        $strLen = mb_strlen($dataString, 'UTF-8');
-        if ($strLen <= $prefixLen + $suffixLen) {
-            return $dataString;
-        }
-        $prefix = mb_substr($dataString, 0, $prefixLen, 'UTF-8');
-        $suffix = mb_substr($dataString, -$suffixLen, $suffixLen, 'UTF-8');
-        $star = str_repeat('*', $strLen - $prefixLen - $suffixLen);
-        
-        return $prefix . $star . $suffix;
-	
-	}
+		$strLen = mb_strlen($dataString, 'UTF-8');
+		if ($strLen <= $prefixLen + $suffixLen) {
+			return $dataString;
+		}
+		$prefix = mb_substr($dataString, 0, $prefixLen, 'UTF-8');
+		$suffix = mb_substr($dataString, -$suffixLen, $suffixLen, 'UTF-8');
+		$star = str_repeat('*', $strLen - $prefixLen - $suffixLen);
 
+		return $prefix . $star . $suffix;
+	}
 }
 
 if (!function_exists('get_now_date_time')) {
@@ -79,88 +110,127 @@ if (!function_exists('get_now_date_time')) {
 }
 
 if (!function_exists('get_show_amount')) {
-	#[DocParams('获取显示金额', ['amount' => ['type' => 'int', 'note' => '待处理的金额'],'return' => ['type' => 'string', 'note' => '当前时间']])]
+	#[DocParams('获取显示金额', ['amount' => ['type' => 'int', 'note' => '待处理的金额'], 'return' => ['type' => 'string', 'note' => '当前时间']])]
 	function get_show_amount(int $amount): string
 	{
-		return bcdiv((string)$amount,'100', 2);
+		return bcdiv((string)$amount, '100', 2);
 	}
 }
 
 //抓换cascader数组为一维数组
 if (!function_exists('get_cascader_array')) {
-   
-    #[DocParams('将级联数组转换为一维去重数组', ['cascader_id_array' => ['type' => 'array', 'note' => '级联二维数组'], 'return' => ['type' => 'array', 'note' => '去重后的一维数组']])]
-    function get_cascader_array(array $cascader_id_array = []):array
-    {
-        $id_array = array_reduce($cascader_id_array,function ($carry, $item) {
-           foreach ($item as $value) {
-                $carry[] = $value;
-            }
-            return $carry;
-        },[]);
+
+	#[DocParams('将级联数组转换为一维去重数组,兼容一维数组', ['cascader_id_array' => ['type' => 'array', 'note' => '级联二维数组'], 'return' => ['type' => 'array', 'note' => '去重后的一维数组']])]
+	function get_cascader_array(array $cascader_id_array = []): array
+	{
+		$id_array = array_reduce($cascader_id_array, function ($carry, $item) {
+			if (is_array($item)) {
+				foreach ($item as $value) {
+					$carry[] = $value;
+				}
+			} else {
+				$carry[] = $item;
+			}
+			return $carry;
+		}, []);
 
 		return array_unique($id_array);
-    }
+	}
 }
-
-// 接口返回码合并
-if (!function_exists('code')) {
-   
-    #[DocParams('合并接口返回码和附加数据', ['code' => ['type' => 'array|null', 'note' => '配置的返回码数组'], 'add' => ['type' => 'array|null', 'note' => '附加数据数组'], 'return' => ['type' => 'array', 'note' => '合并后的结果数组']])]
-    function code(?array $code = null, ?array $add = null)
-    {
-        // 简化逻辑（原逻辑冗余）
-        $code = $code ?? [];
-        $add = $add ?? [];
-
-        return array_merge($code, $add);
-    }
-}
-
 
 // 检测序列化字符串
 if (!function_exists('is_serialized')) {
-    
-    #[DocParams('检测字符串是否为PHP序列化格式', ['data' => ['type' => 'mixed', 'note' => '待检测数据'], 'return' => ['type' => 'bool', 'note' => '是否为序列化字符串']])]
-    function is_serialized(mixed $data):bool
-    {
-        // 非字符串直接返回false
-        if (!is_string($data)) {
-            return false;
-        }
 
-        $data = trim($data);
+	#[DocParams('检测字符串是否为PHP序列化格式', ['data' => ['type' => 'mixed', 'note' => '待检测数据'], 'return' => ['type' => 'bool', 'note' => '是否为序列化字符串']])]
+	function is_serialized(mixed $data): bool
+	{
+		// 非字符串直接返回false
+		if (!is_string($data)) {
+			return false;
+		}
 
-        // 空序列化
-        if ($data === 'N;') {
-            return true;
-        }
+		$data = trim($data);
 
-        // 匹配序列化开头标识
-        if (!preg_match('/^([adObis]):/', $data, $matches)) {
-            return false;
-        }
+		// 空序列化
+		if ($data === 'N;') {
+			return true;
+		}
 
-        $type = $matches[1];
-        switch ($type) {
-            case 'a':
-            case 'O':
-            case 's':
-                return preg_match("/^{$type}:[0-9]+:.*[;}]\$/s", $data);
-            case 'b':
-            case 'i':
-            case 'd':
-                return preg_match("/^{$type}:[0-9.E-]+;\$/", $data);
-            default:
-                return false;
-        }
-    }
+		// 匹配序列化开头标识
+		if (!preg_match('/^([adObis]):/', $data, $matches)) {
+			return false;
+		}
+
+		$type = $matches[1];
+		switch ($type) {
+			case 'a':
+			case 'O':
+			case 's':
+				return preg_match("/^{$type}:[0-9]+:.*[;}]\$/s", $data);
+			case 'b':
+			case 'i':
+			case 'd':
+				return preg_match("/^{$type}:[0-9.E-]+;\$/", $data);
+			default:
+				return false;
+		}
+	}
+
+	// 数组处理相关
+	if (!function_exists('array_level')) {
+
+		#[DocParams('计算数组的最大维度', ['arr' => ['type' => 'array', 'note' => '待计算数组'], 'return' => ['type' => 'int', 'note' => '数组最大维度']])]
+		function array_level(array $arr): int
+		{
+			$levels = [0];
+			total($arr, $levels);
+			return max($levels);
+		}
+	}
+
+	if (!function_exists('total')) {
+
+		#[DocParams('递归计算数组维度（辅助函数）', ['arr' => ['type' => 'mixed', 'note' => '待检测数据'], 'levels' => ['type' => 'array', 'note' => '存储维度的引用数组'], 'level' => ['type' => 'int', 'note' => '当前层级，默认为0'], 'return' => ['type' => 'void', 'note' => '无返回值']])]
+		function total(mixed $arr, array &$levels, int $level = 0): void
+		{
+			if (is_array($arr)) {
+				$level++;
+				$levels[] = $level;
+
+				foreach ($arr as $v) {
+					total($v, $levels, $level);
+				}
+			}
+		}
+	}
+
+	if (!function_exists('to_array')) {
+
+		#[DocParams('将数组每个元素转为单元素数组', ['array' => ['type' => 'mixed', 'note' => '输入数据，非数组返回空数组'], 'return' => ['type' => 'array', 'note' => '处理后的数组']])]
+		function to_array(mixed $array): array
+		{
+			if (!is_array($array)) {
+				return []; // 非数组返回空数组，避免报错
+			}
+
+			foreach ($array as &$v) {
+				$v = [$v];
+			}
+			unset($v); // 释放引用，避免后续变量污染
+
+			return $array;
+		}
+	}
+
+
+	// ID合法性检查
+	if (!function_exists('check_id')) {
+
+		#[DocParams('检查ID是否为纯数字，有效返回自身，无效返回0', ['id' => ['type' => 'mixed', 'note' => '待检查ID'], 'return' => ['type' => 'int', 'note' => '有效ID返回自身，无效返回0']])]
+		function check_id(mixed $id): int
+		{
+			// 简化正则 + 强制转整型，更严谨
+			return preg_match('/^\d+$/', (string)$id) ? (int)$id : 0;
+		}
+	}
 }
-
-
-
-
-
-
-
-

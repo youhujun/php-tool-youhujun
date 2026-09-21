@@ -6,60 +6,43 @@
  * @Author: youhujun youhu8888@163.com
  * @Date: 2026-03-15 23:49:39
  * @LastEditors: youhujun youhu8888@163.com & xueer
- * @LastEditTime: 2026-06-13 11:24:51
+ * @LastEditTime: 2026-08-11 16:10:01
  * @FilePath: \youhu-laravel-api-13d:\wwwroot\PHP\Components\Tool\youhujun\php-tool-youhujun\src\App\Services\V1\Es\EsFacadeService.php
  * Copyright (C) 2026 youhujun. All rights reserved.
  */
 
 namespace YouHuJun\Tool\App\Services\V1\Es;
-
+//注解
+use App\Attributes\Common\DocNote;
+use App\Attributes\Common\DocParams;
 use YouHuJun\Tool\App\Exceptions\CommonException;
 
 /**
  * @see \YouHuJun\Tool\App\Facades\V1\Es\EsFacade
  */
+#[DocNote('Elasticsearch服务类')]
 class EsFacadeService
 {
-    /**
-    * ES服务地址（如：http://127.0.0.1:9200）
-    * @var string
-    */
-    private $esHost;
+	#[DocNote('ES服务地址（如：http://127.0.0.1:9200）')]
+    private string $esHost;
 
-    /**
-     * 请求头（默认JSON格式）
-     * @var array
-     */
-    private $headers;
+	#[DocNote('请求头（默认JSON格式）')]
+    private array $headers;
 
-    /**
-     * ES认证账号
-     * @var string|null
-     */
+	#[DocNote('ES认证账号')]
     private ?string $esUser = null;
 
-    /**
-     * ES认证密码
-     * @var string|null
-     */
+	#[DocNote('ES认证密码')]
     private ?string $esPass = null;
 
-    /**
-     * 数据同步钩子（闭包）
-     * @var \Closure|null
-     */
+	#[DocNote('数据同步钩子（闭包）')]
     private ?\Closure $syncHook = null;
 
-    /**
-     * 数据同步接口实现类实例
-     * @var EsDataSyncContract|null
-     */
+	#[DocNote('数据同步接口实现类实例')]
     private ?EsDataSyncContract $syncContract = null;
 
-    /**
-     * 构造函数（初始化ES配置）
-     * @param string $esHost ES服务地址
-     */
+    
+    #[DocParams('构造函数（初始化ES配置）', ['esHost' => ['type' => 'string', 'note' => 'ES服务地址'], 'esUser' => ['type' => 'string|null', 'note' => 'ES认证账号'], 'esPass' => ['type' => 'string|null', 'note' => 'ES认证密码'], 'return' => ['type' => 'void']])]
     public function __construct(string $esHost = 'http://127.0.0.1:9200', string $esUser = null, string $esPass = null)
     {
         // 去除末尾斜杠，避免URL拼接错误
@@ -79,12 +62,7 @@ class EsFacadeService
         }
     }
 
-    /**
-     * 检查索引是否存在
-     * @param string $index 索引名
-     * @return bool 存在返回true，否则false
-     * @throws \Exception
-     */
+    #[DocParams('检查索引是否存在', ['index' => ['type' => 'string', 'note' => '索引名'], 'return' => ['type' => 'bool', 'note' => '存在返回true，否则false']])]
     public function indexExists(string $index): bool
     {
         $this->validateIndexName($index);
@@ -112,16 +90,7 @@ class EsFacadeService
     }
 
 
-    /**
-     * 创建 Elasticsearch 索引
-     *
-     * 通过 HTTP PUT 请求向 Elasticsearch 服务器发送索引创建请求。
-     * 如果索引已存在，也会返回成功状态。
-     *
-     * @param string $index 索引名称
-     * @param array $body 索引配置和映射信息，默认为空数组
-     * @return array $result 返回数组信息
-     */
+    #[DocParams('创建Elasticsearch索引', ['index' => ['type' => 'string', 'note' => '索引名称'], 'body' => ['type' => 'array', 'note' => '索引配置和映射信息'], 'return' => ['type' => 'array', 'note' => '返回数组信息']])]
     public function createIndex(string $index, array $body = []): array
     {
         $this->validateIndexName($index);
@@ -188,14 +157,8 @@ class EsFacadeService
         return $result;
     }
 
-    /**
-     * 更新 ES 索引映射（新增字段，不删数据、不影响原有字段）
-     * 相当于 MySQL 的 ALTER TABLE ADD COLUMN
-     *
-     * @param string $index 索引名称
-     * @param array $newFields 新增字段的映射配置，格式：['字段名' => ['type' => '字段类型']]
-     * @return array $result 返回数组信息
-     */
+   
+    #[DocParams('更新ES索引映射（新增字段，不删数据）', ['index' => ['type' => 'string', 'note' => '索引名称'], 'newFields' => ['type' => 'array', 'note' => '新增字段的映射配置'], 'return' => ['type' => 'array', 'note' => '返回数组信息']])]
     public function updateMapping(string $index, array $newFields): array
     {
         $this->validateIndexName($index);
@@ -230,11 +193,7 @@ class EsFacadeService
         return $result;
     }
 
-    /**
-     * 删除索引
-     * @param string $index 索引名
-     * @return array $result 数组信息
-     */
+    #[DocParams('删除索引', ['index' => ['type' => 'string', 'note' => '索引名'], 'return' => ['type' => 'array', 'note' => '数组信息']])]
     public function deleteIndex(string $index)
     {
         $this->validateIndexName($index);
@@ -303,15 +262,7 @@ class EsFacadeService
     }
 
 
-    /**
-     * 创建文档
-     *
-     * @param string $index 索引名称
-     * @param array $data 文档数据
-     * @param string|null $docId 文档ID，为null时自动生成
-     * @param bool $refresh 默认开启强制刷新
-     * @return array  $result 数组信息
-     */
+    #[DocParams('创建文档', ['index' => ['type' => 'string', 'note' => '索引名称'], 'data' => ['type' => 'array', 'note' => '文档数据'], 'docId' => ['type' => 'string|null', 'note' => '文档ID，为null时自动生成'], 'refresh' => ['type' => 'bool', 'note' => '默认开启强制刷新'], 'return' => ['type' => 'array', 'note' => '数组信息']])]
     public function createDoc(string $index, array $data, string $docId = null, bool $refresh = true): array
     {
         $this->validateIndexName($index);
@@ -400,13 +351,7 @@ class EsFacadeService
         return $result;
     }
 
-    /**
-     * 获取单个文档
-     * @param string $index 索引名
-     * @param string $docId 文档ID
-     * @return array 响应结果
-     * @throws \Exception
-     */
+    #[DocParams('获取单个文档', ['index' => ['type' => 'string', 'note' => '索引名'], 'docId' => ['type' => 'string', 'note' => '文档ID'], 'return' => ['type' => 'array', 'note' => '响应结果']])]
     public function findDoc(string $index, string $docId): array
     {
         $this->validateIndexName($index);
@@ -462,16 +407,7 @@ class EsFacadeService
         return $result;
     }
 
-    /**
-     * 更新文档（全量/局部）
-     * @param string $index 索引名
-     * @param string $docId 文档ID
-     * @param array $data 更新数据（数组）
-     * @param bool $isPartial 是否局部更新（true=局部，false=全量）
-     * @param bool $refresh 默认开启强制刷新
-     * @return array 响应结果
-     * @throws \Exception
-     */
+    #[DocParams('更新文档（全量/局部）', ['index' => ['type' => 'string', 'note' => '索引名'], 'docId' => ['type' => 'string', 'note' => '文档ID'], 'data' => ['type' => 'array', 'note' => '更新数据'], 'isPartial' => ['type' => 'bool', 'note' => '是否局部更新（true=局部，false=全量）'], 'refresh' => ['type' => 'bool', 'note' => '默认开启强制刷新'], 'return' => ['type' => 'array', 'note' => '响应结果']])]
     public function updateDoc(string $index, string $docId, array $data, bool $isPartial = true, bool $refresh = true): array
     {
         $this->validateIndexName($index);
@@ -604,6 +540,7 @@ class EsFacadeService
      * @return array 响应结果
      * @throws \Exception
      */
+    #[DocParams('删除单个文档', ['index' => ['type' => 'string', 'note' => '索引名'], 'docId' => ['type' => 'string', 'note' => '文档ID'], 'refresh' => ['type' => 'bool', 'note' => '默认开启强制刷新'], 'return' => ['type' => 'array', 'note' => '响应结果']])]
     public function deleteDoc(string $index, string $docId, bool $refresh = true): array
     {
         $this->validateIndexName($index);
@@ -680,15 +617,8 @@ class EsFacadeService
         return $result;
     }
 
-    /**
-     * 按条件搜索文档
-     * @param string $index 索引名（多个用逗号分隔，如：index1,index2）
-     * @param array $query ES查询条件（如：['match' => ['title' => '游鹄生态']]）
-     * @param int $from 起始位置（分页）
-     * @param int $size 返回数量（默认10）
-     * @return array 搜索结果
-     * @throws \Exception
-     */
+    
+    #[DocParams('按条件搜索文档', ['index' => ['type' => 'string', 'note' => '索引名（多个用逗号分隔）'], 'query' => ['type' => 'array', 'note' => 'ES查询条件'], 'from' => ['type' => 'int', 'note' => '起始位置（分页）'], 'size' => ['type' => 'int', 'note' => '返回数量（默认10）'], 'return' => ['type' => 'array', 'note' => '搜索结果']])]
     public function searchDoc(string $index, array $query, int $from = 0, int $size = 10): array
     {
         $this->validateIndexName($index);
@@ -804,14 +734,7 @@ class EsFacadeService
         return $result;
     }
 
-    /**
-     * 按条件删除文档
-     * @param string $index 索引名
-     * @param array $query 删除条件
-     * @param bool $refresh 默认开启强制刷新
-     * @return array 响应结果
-     * @throws \Exception
-     */
+    #[DocParams('按条件删除文档', ['index' => ['type' => 'string', 'note' => '索引名'], 'query' => ['type' => 'array', 'note' => '删除条件'], 'refresh' => ['type' => 'bool', 'note' => '默认开启强制刷新'], 'return' => ['type' => 'array', 'note' => '响应结果']])]
     public function deleteByQuery(string $index, array $query, bool $refresh = true): array
     {
         $this->validateIndexName($index);
@@ -902,6 +825,7 @@ class EsFacadeService
 	 * @param bool $refresh 强制刷新
 	 * @return array
 	 */
+	#[DocParams('清空当前索引内全部文档', ['index' => ['type' => 'string', 'note' => '索引名称'], 'refresh' => ['type' => 'bool', 'note' => '强制刷新'], 'return' => ['type' => 'array']])]
 	public function clearAllDoc(string $index, bool $refresh = true): array
 	{
 		$allQuery = [
@@ -910,14 +834,7 @@ class EsFacadeService
 		return $this->deleteByQuery($index, $allQuery, $refresh);
 	}
 
-    /**
-     * 批量写入/更新文档（直接调用ES _bulk API）
-     *
-     * @param string $index 索引名称
-     * @param array $data 批量数据（每条含 _docId 字段）
-     * @param bool $refresh 默认开启强制刷新
-     * @return array 统一格式的操作结果
-     */
+    #[DocParams('批量写入/更新文档', ['index' => ['type' => 'string', 'note' => '索引名称'], 'data' => ['type' => 'array', 'note' => '批量数据（每条含_docId字段）'], 'refresh' => ['type' => 'bool', 'note' => '默认开启强制刷新'], 'return' => ['type' => 'array', 'note' => '统一格式的操作结果']])]
     public function batchActDoc(string $index, array $data, bool $refresh = true): array
     {
         $this->validateIndexName($index);
@@ -974,6 +891,7 @@ class EsFacadeService
      * @param bool $refresh 默认开启强制刷新
      * @return array 统一格式的操作结果
      */
+    #[DocParams('批量删除文档（支持单ID/多ID/条件删除）', ['index' => ['type' => 'string', 'note' => '索引名称'], 'dataOrCondition' => ['type' => 'string|array', 'note' => '删除条件（单ID/多ID数组/查询条件）'], 'refresh' => ['type' => 'bool', 'note' => '默认开启强制刷新'], 'return' => ['type' => 'array', 'note' => '统一格式的操作结果']])]
     public function batchDeleteDoc(string $index, string|array $dataOrCondition, bool $refresh = true): array
     {
         $this->validateIndexName($index);
@@ -1016,12 +934,7 @@ class EsFacadeService
     }
 
 
-    /**
-     * 解析ES响应结果（转为数组）
-     * @param string $response ES原始响应字符串
-     * @return array 解析后的数组
-     * @throws \Exception
-     */
+    #[DocParams('解析ES响应结果（转为数组）', ['response' => ['type' => 'string', 'note' => 'ES原始响应字符串'], 'return' => ['type' => 'array', 'note' => '解析后的数组']])]
     private function parseResponse(string $response): array
     {
         if (empty($response)) {
@@ -1036,15 +949,7 @@ class EsFacadeService
         return $result;
     }
 
-    /**
-     * 自定义ES请求（兼容特殊操作）
-     * @param string $method 请求方法（GET/POST/PUT/DELETE）
-     * @param string $path 请求路径（如：/_cat/indices）
-     * @param array $data 请求数据（可选）
-     * @param bool $refresh 默认开启强制刷新
-     * @return array 响应结果
-     * @throws \Exception
-     */
+    #[DocParams('自定义ES请求（兼容特殊操作）', ['method' => ['type' => 'string', 'note' => '请求方法（GET/POST/PUT/DELETE）'], 'path' => ['type' => 'string', 'note' => '请求路径（如：/_cat/indices）'], 'data' => ['type' => 'array', 'note' => '请求数据'], 'refresh' => ['type' => 'bool', 'note' => '默认开启强制刷新'], 'return' => ['type' => 'array', 'note' => '响应结果']])]
     public function customRequest(string $method, string $path, array $data = [], bool $refresh = true): array
     {
         $method = strtoupper($method);
@@ -1085,18 +990,7 @@ class EsFacadeService
         return $this->parseResponse($response);
     }
 
-    /**
-     * 验证 Elasticsearch 索引名称是否符合规范
-     *
-     * 索引名称规则：
-     * - 必须小写
-     * - 只能包含字母、数字、下划线、短横线
-     * - 不能以短横线开头
-     *
-     * @param string $index 待验证的索引名称
-     * @throws CommonException 当索引名称不符合规范时抛出异常
-     * @return void
-     */
+    #[DocParams('验证Elasticsearch索引名称是否符合规范', ['index' => ['type' => 'string', 'note' => '待验证的索引名称'], 'return' => ['type' => 'void']])]
     private function validateIndexName(string $index): void
     {
         // ES索引名规范：小写、只能包含字母/数字/下划线/短横线，不能以-开头
